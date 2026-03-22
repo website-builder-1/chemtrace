@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 const HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.3";
-const HF_URL = `https://router.huggingface.co/hf-inference/models/${HF_MODEL}/v1/chat/completions`;
+const HF_URL = `https://api-inference.huggingface.co/models/${HF_MODEL}/v1/chat/completions`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
