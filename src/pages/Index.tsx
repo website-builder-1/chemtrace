@@ -33,7 +33,7 @@ export default function Index() {
         return;
       }
 
-      const routes = getRoutes(name, location, batchSize);
+      const routes = getRoutes(name, location, batchSize, molecule);
       const regulatory = getRegulatory(location);
 
       setResults({
