@@ -17,8 +17,6 @@ export default function ResultsView({ results }: { results: PipelineResults }) {
     <div className="space-y-0">
       <MoleculeIdentityBar results={results} />
       <HR />
-      <AIAgentPanel results={results} />
-      <HR />
       <TopRouteCard route={rec} />
       <HR />
       <SupplyChainSection results={results} />
@@ -30,6 +28,8 @@ export default function ResultsView({ results }: { results: PipelineResults }) {
       <ProtocolGenerator results={results} />
       <HR />
       <ExportSection results={results} />
+      <HR />
+      <AIAgentPanel results={results} />
     </div>
   );
 }
