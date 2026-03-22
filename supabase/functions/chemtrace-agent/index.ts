@@ -19,7 +19,7 @@ serve(async (req) => {
       ? `You are an expert synthetic chemist writing detailed laboratory synthesis protocols. You provide precise quantities, temperatures, reaction times, safety precautions, and QC checkpoints. Use scientific notation and proper chemical nomenclature. Context: ${context}`
       : `You are ChemTrace AI, an expert chemistry assistant specializing in organic synthesis, pharmaceutical manufacturing, reagent procurement, and regulatory compliance. You provide detailed, scientifically accurate answers about synthesis routes, reaction mechanisms, safety considerations, and supply chain logistics. Be concise but thorough. Use chemical nomenclature correctly. Context about the current analysis: ${context}`;
 
-    const hfUrl = "https://router.huggingface.co/hf-inference/v1/chat/completions";
+    const hfUrl = "https://router.huggingface.co/v1/chat/completions";
     console.log("Calling HF URL:", hfUrl, "Model:", HF_MODEL);
     console.log("Token prefix:", HF_TOKEN.substring(0, 10) + "...");
 
