@@ -20,6 +20,7 @@ serve(async (req) => {
       ? `You are an expert synthetic chemist writing detailed laboratory synthesis protocols. You provide precise quantities, temperatures, reaction times, safety precautions, and QC checkpoints. Use scientific notation and proper chemical nomenclature. Context: ${context}`
       : `You are ChemTrace AI, an expert chemistry assistant specializing in organic synthesis, pharmaceutical manufacturing, reagent procurement, and regulatory compliance. You provide detailed, scientifically accurate answers about synthesis routes, reaction mechanisms, safety considerations, and supply chain logistics. Be concise but thorough. Use chemical nomenclature correctly. Context about the current analysis: ${context}`;
 
+    console.log("Calling HF URL:", HF_URL);
     const response = await fetch(HF_URL, {
       method: "POST",
       headers: {
