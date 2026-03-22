@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { PipelineResults, ChatMessage } from '@/types/chemtrace';
+import ReactMarkdown from 'react-markdown';
 import SectionLabel from './SectionLabel';
 
 const SUGGESTED_QUESTIONS = [
