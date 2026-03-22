@@ -100,7 +100,7 @@ export default function AIAgentPanel({ results }: Props) {
     }
   }, []);
 
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  // No auto-scroll — user controls their own scroll position
 
   const sendMessage = (text: string) => {
     if (!text.trim() || isLoading) return;
