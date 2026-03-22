@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 const HF_MODEL = "Qwen/Qwen2.5-Coder-32B-Instruct";
-const HF_URL = `https://router.huggingface.co/hf-inference/models/${HF_MODEL}/v1/chat/completions`;
+const HF_URL = "https://router.huggingface.co/hf-inference/v1/chat/completions";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
