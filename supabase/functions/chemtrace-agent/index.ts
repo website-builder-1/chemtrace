@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const HF_MODEL = "HuggingFaceH4/zephyr-7b-beta";
+const HF_MODEL = "Qwen/Qwen2.5-Coder-32B-Instruct";
 const HF_URL = `https://router.huggingface.co/hf-inference/models/${HF_MODEL}/v1/chat/completions`;
 
 serve(async (req) => {
