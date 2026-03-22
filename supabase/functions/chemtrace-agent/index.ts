@@ -5,8 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.3";
-const HF_URL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions";
+const HF_MODEL = "HuggingFaceH4/zephyr-7b-beta";
+const HF_URL = `https://api-inference.huggingface.co/models/${HF_MODEL}/v1/chat/completions`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
