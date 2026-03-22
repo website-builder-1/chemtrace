@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { PipelineResults, ChatMessage } from '@/types/chemtrace';
+import ReactMarkdown from 'react-markdown';
 import SectionLabel from './SectionLabel';
 
 const SUGGESTED_QUESTIONS = [
@@ -129,6 +130,13 @@ export default function AIAgentPanel({ results }: Props) {
 
       {/* Messages */}
       <div className="mt-3 space-y-3">
+        {isLoading && messages.length === 0 && (
+          <div className="flex items-center gap-2 p-4 border rounded-[3px]" style={{ borderColor: 'hsl(var(--ct-border))', borderLeft: '3px solid hsl(var(--ct-teal))' }}>
+            <div className="w-3.5 h-3.5 border-2 rounded-full animate-ct-spin flex-shrink-0" style={{ borderColor: 'hsl(var(--ct-teal))', borderTopColor: 'transparent' }} />
+            <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>Agent analysing routes…</span>
+          </div>
+        )}
+
         {messages.map((msg, i) => (
           <div
             key={i}
@@ -143,23 +151,24 @@ export default function AIAgentPanel({ results }: Props) {
             <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-muted))' }}>
               {msg.role === 'agent' ? 'CHEMTRACE AI' : 'YOU'}
             </div>
-            <div className="font-body text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'hsl(var(--ct-ink))' }}>
-              {msg.content}
+            <div className="font-body text-sm leading-relaxed prose prose-sm max-w-none" style={{ color: 'hsl(var(--ct-ink))' }}>
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
           </div>
         ))}
 
-        {isLoading && messages.length === 0 && (
-          <div className="flex items-center gap-2 p-4">
-            <div className="w-4 h-4 border-2 rounded-full animate-ct-spin" style={{ borderColor: 'hsl(var(--ct-teal))', borderTopColor: 'transparent' }} />
-            <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>Agent analysing routes…</span>
+        {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'user' && (
+          <div className="flex items-center gap-2 p-3">
+            <div className="w-3.5 h-3.5 border-2 rounded-full animate-ct-spin flex-shrink-0" style={{ borderColor: 'hsl(var(--ct-teal))', borderTopColor: 'transparent' }} />
+            <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>Generating response…</span>
           </div>
         )}
+
         <div ref={chatEndRef} />
       </div>
 
       {/* Suggested questions */}
-      {initialDone && !isLoading && (
+      {!isLoading && (
         <div className="mt-4">
           <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-2" style={{ color: 'hsl(var(--ct-muted))' }}>SUGGESTED QUESTIONS</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">

@@ -1,8 +1,14 @@
+import { useState } from 'react';
 import type { PipelineResults } from '@/types/chemtrace';
 import SectionLabel from './SectionLabel';
 
+function getSmilesImageUrl(smiles: string, size = 300) {
+  return `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeURIComponent(smiles)}/PNG?image_size=${size}x${size}`;
+}
+
 export default function MoleculeIdentityBar({ results }: { results: PipelineResults }) {
   const { molecule, location, regulatory } = results;
+  const [imgError, setImgError] = useState(false);
   const metrics = [
     { label: 'MW', value: molecule.mw },
     { label: 'XLOGP', value: molecule.xlogp },
@@ -19,6 +25,18 @@ export default function MoleculeIdentityBar({ results }: { results: PipelineResu
           <div className="font-mono-data text-sm mt-1 break-all" style={{ color: 'hsl(var(--ct-teal))' }}>{molecule.smiles}</div>
           {molecule.iupac && (
             <div className="font-body text-xs italic mt-1" style={{ color: 'hsl(var(--ct-muted))' }}>{molecule.iupac}</div>
+          )}
+          {/* Structural formula from PubChem */}
+          {!imgError && (
+            <div className="mt-3 flex justify-center">
+              <img
+                src={getSmilesImageUrl(molecule.smiles)}
+                alt={`Structural formula of ${molecule.name}`}
+                className="max-w-[220px] bg-white rounded-[3px] border p-1"
+                style={{ borderColor: 'hsl(var(--ct-border))' }}
+                onError={() => setImgError(true)}
+              />
+            </div>
           )}
         </div>
         {metrics.map(m => (
