@@ -168,7 +168,7 @@ export default function AIAgentPanel({ results }: Props) {
       </div>
 
       {/* Suggested questions */}
-      {initialDone && !isLoading && (
+      {!isLoading && (
         <div className="mt-4">
           <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-2" style={{ color: 'hsl(var(--ct-muted))' }}>SUGGESTED QUESTIONS</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
