@@ -5,8 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.3";
-const HF_URL = `https://router.huggingface.co/hf-inference/models/${HF_MODEL}/v1/chat/completions`;
+const HF_MODEL = "Qwen/Qwen2.5-72B-Instruct:novita";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -20,7 +19,11 @@ serve(async (req) => {
       ? `You are an expert synthetic chemist writing detailed laboratory synthesis protocols. You provide precise quantities, temperatures, reaction times, safety precautions, and QC checkpoints. Use scientific notation and proper chemical nomenclature. Context: ${context}`
       : `You are ChemTrace AI, an expert chemistry assistant specializing in organic synthesis, pharmaceutical manufacturing, reagent procurement, and regulatory compliance. You provide detailed, scientifically accurate answers about synthesis routes, reaction mechanisms, safety considerations, and supply chain logistics. Be concise but thorough. Use chemical nomenclature correctly. Context about the current analysis: ${context}`;
 
-    const response = await fetch(HF_URL, {
+    const hfUrl = "https://router.huggingface.co/v1/chat/completions";
+    console.log("Calling HF URL:", hfUrl, "Model:", HF_MODEL);
+    console.log("Token prefix:", HF_TOKEN.substring(0, 10) + "...");
+
+    const response = await fetch(hfUrl, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${HF_TOKEN}`,
@@ -38,6 +41,10 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      const t = await response.text();
+      console.error("HF error:", response.status, response.statusText, "body:", t);
+      console.error("HF response headers:", JSON.stringify(Object.fromEntries(response.headers.entries())));
+      
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Hugging Face rate limit reached. Free tier allows ~5 requests/min. Please wait and try again." }), {
           status: 429,
@@ -50,8 +57,6 @@ serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const t = await response.text();
-      console.error("Hugging Face API error:", response.status, t);
       return new Response(JSON.stringify({ error: `Hugging Face error (${response.status}): ${t}` }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
