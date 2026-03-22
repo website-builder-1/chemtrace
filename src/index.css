@@ -2,95 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --background: 40 33% 95%;
+    --foreground: 210 10% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 210 10% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 210 10% 12%;
+    --primary: 180 34% 26%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 37 28% 91%;
+    --secondary-foreground: 210 10% 12%;
+    --muted: 37 18% 72%;
+    --muted-foreground: 30 5% 30%;
+    --accent: 37 28% 91%;
+    --accent-foreground: 210 10% 12%;
+    --destructive: 0 50% 30%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 35 20% 72%;
+    --input: 210 12% 17%;
+    --ring: 180 34% 26%;
+    --radius: 3px;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --ct-ink: 210 10% 12%;
+    --ct-muted: 30 5% 30%;
+    --ct-teal: 180 34% 26%;
+    --ct-teal-hover: 180 30% 35%;
+    --ct-paper: 40 33% 95%;
+    --ct-paper2: 37 28% 91%;
+    --ct-sidebar: 210 10% 12%;
+    --ct-sidebar-input: 212 14% 17%;
+    --ct-sidebar-text: 205 17% 82%;
+    --ct-sidebar-label: 200 12% 66%;
+    --ct-border: 35 20% 72%;
+    --ct-agent-dark: 180 40% 16%;
+    --ct-agent-pulse: 162 38% 54%;
+    --ct-status-green: 149 35% 21%;
+    --ct-status-gold: 38 55% 23%;
+    --ct-status-red: 0 38% 30%;
+    --ct-amber: 30 48% 39%;
+    --ct-green-bg: 134 35% 85%;
+    --ct-green-border: 134 30% 65%;
   }
 }
 
@@ -98,8 +51,39 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
+    font-family: 'Source Sans 3', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+}
+
+.font-serif-display {
+  font-family: 'Libre Baskerville', serif;
+}
+
+.font-mono-data {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.font-body {
+  font-family: 'Source Sans 3', sans-serif;
+}
+
+@keyframes ct-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes ct-spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-ct-pulse {
+  animation: ct-pulse 2s infinite;
+}
+
+.animate-ct-spin {
+  animation: ct-spin 1s linear infinite;
 }
