@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { PipelineResults } from '@/types/chemtrace';
+import ReactMarkdown from 'react-markdown';
 import SectionLabel from './SectionLabel';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chemtrace-agent`;
