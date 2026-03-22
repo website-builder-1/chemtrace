@@ -144,8 +144,8 @@ export default function AIAgentPanel({ results }: Props) {
             <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-muted))' }}>
               {msg.role === 'agent' ? 'CHEMTRACE AI' : 'YOU'}
             </div>
-            <div className="font-body text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'hsl(var(--ct-ink))' }}>
-              {msg.content}
+            <div className="font-body text-sm leading-relaxed prose prose-sm max-w-none" style={{ color: 'hsl(var(--ct-ink))' }}>
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
           </div>
         ))}

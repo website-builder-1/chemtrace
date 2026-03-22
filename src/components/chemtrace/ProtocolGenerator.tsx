@@ -100,10 +100,10 @@ export default function ProtocolGenerator({ results }: { results: PipelineResult
         )}
       </div>
       <div
-        className="bg-card border rounded-[3px] p-5 font-body text-sm leading-[1.75] whitespace-pre-wrap min-h-[160px]"
+        className="bg-card border rounded-[3px] p-5 font-body text-sm leading-[1.75] min-h-[160px] prose prose-sm max-w-none"
         style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-ink))' }}
       >
-        {protocol}
+        <ReactMarkdown>{protocol}</ReactMarkdown>
       </div>
     </section>
   );
