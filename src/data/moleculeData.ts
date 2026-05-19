@@ -491,7 +491,8 @@ function generateDynamicRoutes(molecule: MoleculeData, location: string, batchMg
 
 export function getMoleculeData(name: string): MoleculeData | null {
   const key = name.toLowerCase().trim();
-  return MOLECULES[key] || null;
+  const m = MOLECULES[key];
+  return m ? { ...m, source: 'curated' } : null;
 }
 
 export function getRoutes(moleculeName: string, location: string, batchMg: number, molecule?: MoleculeData): SynthesisRoute[] {
