@@ -7,6 +7,8 @@ export interface MoleculeData {
   hbd: number;
   rings: number;
   cid?: number;
+  /** Data provenance — drives the verification badge in the UI. */
+  source?: 'pubchem' | 'curated' | 'ai-inferred';
 }
 
 export type RiskLevel = 'low' | 'medium' | 'high';

@@ -35,6 +35,7 @@ export async function fetchFromPubChem(name: string): Promise<MoleculeData | nul
       hbd: props.HBondDonorCount ?? 0,
       rings: countRingsFromSmiles(smiles),
       cid: props.CID,
+      source: 'pubchem',
     };
   } catch {
     return null;
