@@ -111,8 +111,25 @@ export default function AIAgentPanel({ results }: Props) {
     streamResponse(updated);
   };
 
+  // Listen for per-step "Explain this" events from TopRouteCard
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ prompt: string }>).detail;
+      if (!detail?.prompt || isLoading) return;
+      const userMsg: ChatMessage = { role: 'user', content: detail.prompt };
+      setMessages(prev => {
+        const next = [...prev, userMsg];
+        streamResponse(next);
+        return next;
+      });
+    };
+    window.addEventListener('chemtrace:explain', handler as EventListener);
+    return () => window.removeEventListener('chemtrace:explain', handler as EventListener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]);
+
   return (
-    <section>
+    <section id="chemtrace-ai-panel">
       <SectionLabel label="CHEMTRACE AI AGENT" />
 
       {/* Header bar */}
