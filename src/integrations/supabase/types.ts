@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      runs: {
+        Row: {
+          batch_size_mg: number
+          created_at: string
+          id: string
+          location: string
+          molecule_name: string
+          recommended_route_name: string
+          results: Json
+          user_id: string
+        }
+        Insert: {
+          batch_size_mg: number
+          created_at?: string
+          id?: string
+          location: string
+          molecule_name: string
+          recommended_route_name: string
+          results: Json
+          user_id: string
+        }
+        Update: {
+          batch_size_mg?: number
+          created_at?: string
+          id?: string
+          location?: string
+          molecule_name?: string
+          recommended_route_name?: string
+          results?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

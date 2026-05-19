@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, LogOut } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, Save, History } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import type { PipelineResults } from '@/types/chemtrace';
 import { CURATED_MOLECULES, getMoleculeData, getRoutes, getRegulatory } from '@/data/moleculeData';
 import { fetchFromPubChem } from '@/lib/pubchem';
+import { CURRENCIES, type Currency } from '@/lib/currency';
 import ResultsView from '@/components/chemtrace/ResultsView';
+import RunsDialog from '@/components/chemtrace/RunsDialog';
 
 const LOCATIONS = ['UK', 'EU', 'USA', 'India', 'China', 'Switzerland', 'Japan'];
 
@@ -17,17 +20,19 @@ interface SidebarBodyProps {
   setBatchSize: (v: number) => void;
   location: string;
   setLocation: (v: string) => void;
+  currency: Currency;
+  setCurrency: (v: Currency) => void;
   isLoading: boolean;
   runPipeline: () => void;
   userEmail: string | null;
+  hasResults: boolean;
+  onSaveRun: () => void;
+  onOpenRuns: () => void;
   onAuthClick: () => void;
   onSignOut: () => void;
 }
 
-function SidebarBody({
-  query, setQuery, batchSize, setBatchSize, location, setLocation,
-  isLoading, runPipeline, userEmail, onAuthClick, onSignOut,
-}: SidebarBodyProps) {
+function SidebarBody(p: SidebarBodyProps) {
   const inputClass = "w-full px-3 py-2 rounded-[3px] font-mono-data text-sm border border-[hsl(var(--ct-border))]/30 focus:outline-none focus:ring-1 focus:ring-[hsl(var(--ct-teal))]";
 
   return (
@@ -45,20 +50,20 @@ function SidebarBody({
           <label className="font-mono-data uppercase text-[0.55rem] tracking-wider block mb-1" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>CHEMICAL NAME OR SMILES</label>
           <input
             type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
+            value={p.query}
+            onChange={e => p.setQuery(e.target.value)}
             placeholder="ibuprofen"
             className={inputClass}
             style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: '#E2EAF0', minHeight: '44px' }}
-            onKeyDown={e => e.key === 'Enter' && runPipeline()}
+            onKeyDown={e => e.key === 'Enter' && p.runPipeline()}
           />
         </div>
         <div>
           <label className="font-mono-data uppercase text-[0.55rem] tracking-wider block mb-1" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>BATCH SIZE (MG)</label>
           <input
             type="number"
-            value={batchSize}
-            onChange={e => setBatchSize(Number(e.target.value))}
+            value={p.batchSize}
+            onChange={e => p.setBatchSize(Number(e.target.value))}
             className={inputClass}
             style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: '#E2EAF0', minHeight: '44px' }}
           />
@@ -66,13 +71,32 @@ function SidebarBody({
         <div>
           <label className="font-mono-data uppercase text-[0.55rem] tracking-wider block mb-1" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>PRODUCTION LOCATION</label>
           <select
-            value={location}
-            onChange={e => setLocation(e.target.value)}
+            value={p.location}
+            onChange={e => p.setLocation(e.target.value)}
             className={inputClass}
             style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: '#E2EAF0', minHeight: '44px' }}
           >
             {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
           </select>
+        </div>
+        <div>
+          <label className="font-mono-data uppercase text-[0.55rem] tracking-wider block mb-1" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>CURRENCY</label>
+          <div className="flex gap-1 p-1 rounded-[3px]" style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))' }}>
+            {CURRENCIES.map(c => (
+              <button
+                key={c}
+                onClick={() => p.setCurrency(c)}
+                className="flex-1 py-1.5 rounded-[2px] font-mono-data text-[0.65rem] uppercase tracking-wider transition-colors"
+                style={{
+                  backgroundColor: p.currency === c ? 'hsl(var(--ct-teal))' : 'transparent',
+                  color: p.currency === c ? 'white' : 'hsl(var(--ct-sidebar-label))',
+                  minHeight: '36px',
+                }}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -86,29 +110,42 @@ function SidebarBody({
 
       <div className="space-y-2 mt-auto">
         <button
-          onClick={runPipeline}
-          disabled={isLoading}
+          onClick={p.runPipeline}
+          disabled={p.isLoading}
           className="w-full px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] text-white transition-colors duration-150 disabled:opacity-50"
           style={{ backgroundColor: 'hsl(var(--ct-teal))', minHeight: '44px' }}
         >
-          {isLoading ? 'Running…' : 'Run ChemTrace →'}
+          {p.isLoading ? 'Running…' : 'Run ChemTrace →'}
         </button>
-        <button
-          onClick={runPipeline}
-          disabled={isLoading}
-          className="w-full px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] border transition-colors duration-150 disabled:opacity-50"
-          style={{ borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-sidebar-text))', opacity: 0.7, minHeight: '44px' }}
-        >
-          Regenerate
-        </button>
+
+        {p.userEmail && p.hasResults && (
+          <button
+            onClick={p.onSaveRun}
+            disabled={p.isLoading}
+            className="w-full flex items-center justify-center gap-2 px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] border transition-colors duration-150 disabled:opacity-50"
+            style={{ borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-sidebar-text))', minHeight: '44px' }}
+          >
+            <Save className="w-3.5 h-3.5" /> Save Run
+          </button>
+        )}
+
+        {p.userEmail && (
+          <button
+            onClick={p.onOpenRuns}
+            className="w-full flex items-center justify-center gap-2 px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] border transition-colors duration-150"
+            style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-sidebar-text))', minHeight: '44px' }}
+          >
+            <History className="w-3.5 h-3.5" /> My Runs
+          </button>
+        )}
 
         <hr className="my-2" style={{ borderColor: 'hsl(var(--ct-border))', opacity: 0.3 }} />
 
-        {userEmail ? (
+        {p.userEmail ? (
           <>
-            <div className="font-mono-data text-[0.65rem] truncate px-1" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>{userEmail}</div>
+            <div className="font-mono-data text-[0.65rem] truncate px-1" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>{p.userEmail}</div>
             <button
-              onClick={onSignOut}
+              onClick={p.onSignOut}
               className="w-full flex items-center justify-center gap-2 px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] border transition-colors duration-150"
               style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-sidebar-text))', minHeight: '44px' }}
             >
@@ -117,7 +154,7 @@ function SidebarBody({
           </>
         ) : (
           <button
-            onClick={onAuthClick}
+            onClick={p.onAuthClick}
             className="w-full flex items-center justify-center gap-2 px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] border transition-colors duration-150"
             style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-sidebar-text))', minHeight: '44px' }}
           >
@@ -134,18 +171,23 @@ export default function Index() {
   const [query, setQuery] = useState('');
   const [batchSize, setBatchSize] = useState(500);
   const [location, setLocation] = useState('UK');
+  const [currency, setCurrency] = useState<Currency>('GBP');
   const [results, setResults] = useState<PipelineResults | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [runsOpen, setRunsOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserEmail(session?.user?.email ?? null);
+      setUserId(session?.user?.id ?? null);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUserEmail(session?.user?.email ?? null);
+      setUserId(session?.user?.id ?? null);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -189,39 +231,50 @@ export default function Index() {
     setMobileMenuOpen(false);
   };
 
+  const handleSaveRun = async () => {
+    if (!results || !userId) return;
+    const rec = results.routes.find(r => r.id === results.recommendedRouteId)!;
+    const { error: insertError } = await supabase.from('runs').insert({
+      user_id: userId,
+      molecule_name: results.molecule.name,
+      location: results.location,
+      batch_size_mg: results.batchSizeMg,
+      recommended_route_name: rec.name,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      results: results as any,
+    });
+    if (insertError) {
+      toast.error(`Could not save: ${insertError.message}`);
+    } else {
+      toast.success(`Saved ${results.molecule.name} to your runs.`);
+    }
+  };
+
   const sidebarProps: SidebarBodyProps = {
     query, setQuery, batchSize, setBatchSize, location, setLocation,
+    currency, setCurrency,
     isLoading, runPipeline, userEmail,
+    hasResults: !!results,
+    onSaveRun: handleSaveRun,
+    onOpenRuns: () => { setMobileMenuOpen(false); setRunsOpen(true); },
     onAuthClick: () => { setMobileMenuOpen(false); navigate('/auth'); },
     onSignOut: handleSignOut,
   };
 
   return (
     <div className="flex min-h-screen">
-      {/* Desktop sidebar */}
-      <aside
-        className="hidden lg:flex w-[280px] flex-shrink-0 flex-col"
-        style={{ borderRight: '2px solid hsl(var(--ct-teal))' }}
-      >
+      <aside className="hidden lg:flex w-[280px] flex-shrink-0 flex-col" style={{ borderRight: '2px solid hsl(var(--ct-teal))' }}>
         <SidebarBody {...sidebarProps} />
       </aside>
 
-      {/* Mobile top bar */}
       <header
         className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3"
-        style={{
-          backgroundColor: 'hsl(var(--ct-sidebar))',
-          borderBottom: '2px solid hsl(var(--ct-teal))',
-        }}
+        style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderBottom: '2px solid hsl(var(--ct-teal))' }}
       >
         <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-teal))' }}>⚗ ChemTrace</span>
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
-            <button
-              aria-label="Open menu"
-              className="flex items-center justify-center rounded-[3px] text-white"
-              style={{ minWidth: '44px', minHeight: '44px' }}
-            >
+            <button aria-label="Open menu" className="flex items-center justify-center rounded-[3px] text-white" style={{ minWidth: '44px', minHeight: '44px' }}>
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </SheetTrigger>
@@ -231,11 +284,7 @@ export default function Index() {
         </Sheet>
       </header>
 
-      {/* Main canvas */}
-      <main
-        className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 pt-[72px] lg:pt-6"
-        style={{ backgroundColor: 'hsl(var(--ct-paper))' }}
-      >
+      <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 pt-[72px] lg:pt-6" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
         {error && (
           <div className="mb-4 p-3 rounded-[3px] font-body text-sm" style={{ backgroundColor: 'hsl(0,90%,96%)', borderLeft: '3px solid hsl(var(--ct-status-red))', color: 'hsl(var(--ct-ink))' }}>
             {error}
@@ -249,7 +298,7 @@ export default function Index() {
           </div>
         )}
 
-        {results && !isLoading && <ResultsView results={results} />}
+        {results && !isLoading && <ResultsView results={results} currency={currency} />}
 
         {!results && !isLoading && !error && (
           <div className="flex items-center justify-center h-full min-h-[500px]">
@@ -278,6 +327,12 @@ export default function Index() {
           </div>
         )}
       </main>
+
+      <RunsDialog
+        open={runsOpen}
+        onClose={() => setRunsOpen(false)}
+        onLoadRun={r => setResults(r)}
+      />
     </div>
   );
 }
