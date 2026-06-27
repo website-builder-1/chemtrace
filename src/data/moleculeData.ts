@@ -1,5 +1,9 @@
-import type { MoleculeData, SynthesisRoute, RegulatoryFramework, ReagentInfo, RiskLevel } from '@/types/chemtrace';
+import type { MoleculeData, RegulatoryFramework } from '@/types/chemtrace';
 
+/**
+ * Property fallbacks only. Synthesis routes are produced dynamically by the
+ * `retrosynthesis` edge function — there are no curated route lists any more.
+ */
 export const CURATED_MOLECULES = [
   'ibuprofen', 'aspirin', 'paracetamol', 'naproxen',
   'dopamine', 'caffeine', 'atenolol', 'metformin',
