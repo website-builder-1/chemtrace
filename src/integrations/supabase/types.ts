@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      retrosynthesis_cache: {
+        Row: {
+          canonical_smiles: string
+          created_at: string
+          engine: string
+          id: string
+          payload: Json
+          updated_at: string
+        }
+        Insert: {
+          canonical_smiles: string
+          created_at?: string
+          engine?: string
+          id?: string
+          payload: Json
+          updated_at?: string
+        }
+        Update: {
+          canonical_smiles?: string
+          created_at?: string
+          engine?: string
+          id?: string
+          payload?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       runs: {
         Row: {
           batch_size_mg: number

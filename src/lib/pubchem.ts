@@ -15,19 +15,21 @@ function countRingsFromSmiles(smiles: string): number {
   return Math.floor(ringDigits / 2);
 }
 
-export async function fetchFromPubChem(name: string): Promise<MoleculeData | null> {
+const PROPS = 'MolecularWeight,XLogP,HBondDonorCount,IUPACName,CanonicalSMILES';
+
+async function fetchByLookup(lookup: string, value: string): Promise<MoleculeData | null> {
   try {
-    const propUrl = `${BASE}/compound/name/${encodeURIComponent(name)}/property/MolecularWeight,XLogP,HBondDonorCount,IUPACName,CanonicalSMILES/JSON`;
-    const res = await fetch(propUrl);
+    const url = `${BASE}/compound/${lookup}/${encodeURIComponent(value)}/property/${PROPS}/JSON`;
+    const res = await fetch(url);
     if (!res.ok) return null;
     const data = await res.json();
     const props = data?.PropertyTable?.Properties?.[0];
     if (!props) return null;
-    // PubChem may return SMILES under CanonicalSMILES or ConnectivitySMILES
     const smiles = props.CanonicalSMILES || props.ConnectivitySMILES || '';
     const mw = typeof props.MolecularWeight === 'string' ? parseFloat(props.MolecularWeight) : (props.MolecularWeight ?? 0);
+    const displayName = props.IUPACName || value;
     return {
-      name: name.charAt(0).toUpperCase() + name.slice(1),
+      name: displayName,
       smiles,
       iupac: props.IUPACName || '',
       mw,
@@ -40,4 +42,15 @@ export async function fetchFromPubChem(name: string): Promise<MoleculeData | nul
   } catch {
     return null;
   }
+}
+
+export function fetchFromPubChem(name: string): Promise<MoleculeData | null> {
+  return fetchByLookup('name', name).then(m => m
+    ? { ...m, name: name.charAt(0).toUpperCase() + name.slice(1) }
+    : null);
+}
+
+/** Lookup a molecule by SMILES (already canonical, ideally). */
+export function fetchFromPubChemBySmiles(smiles: string): Promise<MoleculeData | null> {
+  return fetchByLookup('smiles', smiles);
 }
