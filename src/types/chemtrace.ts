@@ -1,6 +1,8 @@
 export interface MoleculeData {
   name: string;
   smiles: string;
+  /** RDKit-canonicalised SMILES — the single internal representation. */
+  canonicalSmiles?: string;
   iupac: string;
   mw: number;
   xlogp: number;
@@ -18,6 +20,24 @@ export interface RouteStep {
   number: number;
   description: string;
   smiles?: string;
+  /** Reaction SMILES "reactants>>product" when supplied by the engine. */
+  reactionSmiles?: string;
+  /** Predicted reaction conditions for this step. */
+  conditions?: ReactionConditions;
+  /** Per-step confidence score (0–1) from the retrosynthesis model. */
+  confidence?: number;
+}
+
+export interface ReactionConditions {
+  solvent?: string;
+  catalyst?: string;
+  reagents?: string;
+  temperature?: string;
+  pressure?: string;
+  time?: string;
+  confidence?: number;
+  source?: string;
+  precedents?: number;
 }
 
 export interface ReagentInfo {
