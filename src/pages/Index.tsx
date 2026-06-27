@@ -328,6 +328,12 @@ export default function Index() {
               <p className="font-body text-sm sm:text-base leading-[1.7] mb-5" style={{ color: 'hsl(var(--ct-muted))' }}>
                 Enter a molecule name or SMILES string. Chemtraceit evaluates synthesis routes, checks reagent supply chains, assesses regulatory compliance, and recommends the optimal pathway for your production location and batch size.
               </p>
+                <div className="border rounded-[3px] p-3 mb-4 text-left" style={{ backgroundColor: 'hsl(38,90%,96%)', borderColor: 'hsl(var(--ct-status-gold))' }}>
+                  <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-status-gold))' }}>RESPONSIBLE-USE NOTICE</div>
+                  <p className="font-body text-[0.78rem] leading-relaxed" style={{ color: 'hsl(var(--ct-ink))' }}>
+                    Chemtraceit will not plan syntheses for controlled narcotics, CWC-scheduled chemical weapons agents, or primary high explosives. Scheduled drug precursors and CWC Schedule 2/3 dual-use chemicals require an acknowledgement and remain the user's compliance responsibility under their local laws (UK MDA 1971, US CSA, EU 273/2004, CWC, etc.).
+                  </p>
+                </div>
               <div className="border rounded-[3px] p-4 bg-card" style={{ borderColor: 'hsl(var(--ct-border))' }}>
                 <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-2" style={{ color: 'hsl(var(--ct-muted))' }}>CURATED MOLECULES — NO SETUP NEEDED</div>
                 <div className="flex flex-wrap justify-center gap-1.5">
