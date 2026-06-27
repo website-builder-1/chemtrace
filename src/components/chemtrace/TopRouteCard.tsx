@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ExternalLink, Sparkles, Leaf } from 'lucide-react';
-import type { SynthesisRoute, MoleculeData } from '@/types/chemtrace';
+import { ExternalLink, Sparkles, Leaf, FlaskConical, Bot } from 'lucide-react';
+import type { SynthesisRoute, MoleculeData, ReactionConditions } from '@/types/chemtrace';
 import { fmt, type Currency } from '@/lib/currency';
 import { computeGreenMetrics, ratingColor } from '@/lib/greenChem';
 import { searchLiterature, buildQuery, type Citation } from '@/lib/literature';
@@ -33,6 +33,47 @@ function emitExplainStep(stepNumber: number, description: string, routeName: str
     const el = document.getElementById('chemtrace-ai-panel');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 50);
+}
+
+function ConditionsBlock({ c }: { c?: ReactionConditions }) {
+  if (!c) return null;
+  const rows: Array<[string, string | undefined]> = [
+    ['Solvent', c.solvent],
+    ['Catalyst', c.catalyst],
+    ['Reagents', c.reagents],
+    ['Temperature', c.temperature],
+    ['Pressure', c.pressure],
+    ['Time', c.time],
+  ];
+  const visible = rows.filter(([, v]) => v && v.trim());
+  if (visible.length === 0) return null;
+  return (
+    <div className="mt-1.5 ml-7 p-2 rounded-[3px] border" style={{ backgroundColor: 'hsl(var(--ct-paper2))', borderColor: 'hsl(var(--ct-border))' }}>
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <FlaskConical className="w-3 h-3" style={{ color: 'hsl(var(--ct-teal))' }} />
+        <span className="font-mono-data uppercase text-[0.55rem] tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>PREDICTED CONDITIONS</span>
+        {typeof c.confidence === 'number' && (
+          <span className="font-mono-data text-[0.55rem] px-1 py-px rounded-[2px]" style={{ color: 'white', backgroundColor: c.confidence >= 0.7 ? 'hsl(var(--ct-status-green))' : c.confidence >= 0.4 ? 'hsl(var(--ct-status-gold))' : 'hsl(var(--ct-status-red))' }}>
+            CONF {(c.confidence * 100).toFixed(0)}%
+          </span>
+        )}
+        {typeof c.precedents === 'number' && (
+          <span className="font-mono-data text-[0.55rem]" style={{ color: 'hsl(var(--ct-muted))' }}>· {c.precedents} precedents</span>
+        )}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5">
+        {visible.map(([k, v]) => (
+          <div key={k} className="font-body text-[0.72rem] leading-snug">
+            <span className="font-mono-data uppercase text-[0.55rem] tracking-wider mr-1" style={{ color: 'hsl(var(--ct-muted))' }}>{k}:</span>
+            <span style={{ color: 'hsl(var(--ct-ink))' }}>{v}</span>
+          </div>
+        ))}
+      </div>
+      {c.source && (
+        <div className="font-mono-data text-[0.55rem] mt-1" style={{ color: 'hsl(var(--ct-muted))' }}>Source: {c.source}</div>
+      )}
+    </div>
+  );
 }
 
 export default function TopRouteCard({ route, molecule, currency }: TopRouteCardProps) {
@@ -70,6 +111,11 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
           <span className="font-mono-data uppercase text-[0.6rem] tracking-wider text-white px-2 py-0.5 rounded-[1px]" style={{ backgroundColor: 'hsl(var(--ct-teal))' }}>★ Recommended</span>
           <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-ink))' }}>{route.name}</span>
           <span className="font-mono-data uppercase text-[0.6rem] tracking-wider" style={{ color: st.color }}>{st.icon} {route.status}</span>
+          {route.aiGenerated && (
+            <span className="inline-flex items-center gap-1 font-mono-data uppercase text-[0.55rem] tracking-wider px-1.5 py-0.5 rounded-[2px]" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-status-gold))' }} title={`Engine: ${route.engine}`}>
+              <Bot className="w-3 h-3" /> AI-GENERATED · {route.engine}
+            </span>
+          )}
         </div>
 
         {/* Stats */}
@@ -118,6 +164,9 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                   {step.description}
                   {step.smiles && <code className="ml-1 font-mono-data text-[0.7rem] px-1 py-0.5 rounded-[2px]" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-teal))' }}>{step.smiles}</code>}
                 </span>
+                {typeof step.confidence === 'number' && (
+                  <span className="ml-2 font-mono-data text-[0.55rem]" style={{ color: 'hsl(var(--ct-muted))' }}>· step conf {(step.confidence * 100).toFixed(0)}%</span>
+                )}
                 <button
                   onClick={() => emitExplainStep(step.number, step.description, route.name)}
                   className="ml-1 inline-flex items-center gap-1 font-mono-data text-[0.6rem] uppercase tracking-wider px-1.5 py-0.5 rounded-[2px] transition-colors"
@@ -126,6 +175,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                 >
                   <Sparkles className="w-2.5 h-2.5" /> Explain
                 </button>
+                <ConditionsBlock c={step.conditions} />
               </div>
             </div>
           ))}
