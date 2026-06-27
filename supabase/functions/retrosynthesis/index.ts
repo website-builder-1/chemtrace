@@ -12,7 +12,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 // @ts-expect-error - no Deno types for npm: specifier
-import initRDKitModule from "npm:@rdkit/rdkit@2024.3.5";
+import initRDKitModule from "npm:@rdkit/rdkit@2025.3.4-1.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
