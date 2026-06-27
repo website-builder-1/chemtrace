@@ -197,7 +197,7 @@ export default function Index() {
   }, []);
 
   const runPipeline = async (opts?: { bypassScreening?: boolean }) => {
-    const name = query.trim() || 'ibuprofen';
+    const raw = query.trim() || 'ibuprofen';
     setIsLoading(true);
     setError('');
     setResults(null);
@@ -205,38 +205,83 @@ export default function Index() {
 
     // ── Controlled-substance / illegal-chemical guardrail ──
     if (!opts?.bypassScreening) {
-      const screened = screenSubstance(name);
+      const screened = screenSubstance(raw);
       if (screened) {
         setIsLoading(false);
-        setScreening({ result: screened, name });
+        setScreening({ result: screened, name: raw });
         // For 'block' we stop here; 'warn' also pauses until the user acknowledges.
         return;
       }
     }
 
     try {
-      let molecule = getMoleculeData(name);
-      if (!molecule) {
-        const pubchem = await fetchFromPubChem(name);
-        if (pubchem) molecule = pubchem;
+      const isSmiles = looksLikeSmiles(raw);
+
+      // 1. Resolve a working SMILES — never name-lookup if user gave a SMILES.
+      let molecule = isSmiles ? null : getMoleculeData(raw);
+      if (!molecule && !isSmiles) {
+        molecule = await fetchFromPubChem(raw);
       }
-      if (!molecule) {
-        setError(`Molecule "${name}" not found. Try one of the curated molecules or a valid chemical name.`);
+      const workingSmiles = molecule?.smiles ?? (isSmiles ? raw : '');
+      if (!workingSmiles) {
+        setError(`Could not resolve "${raw}" to a structure. Try a SMILES string or a recognised chemical name.`);
         setIsLoading(false);
         return;
       }
 
-      const routes = getRoutes(name, location, batchSize, molecule);
-      const regulatory = getRegulatory(location);
+      // 2. Retrosynthesis engine — RDKit validates + canonicalises, then routes are generated.
+      const engine = await runRetrosynthesis(workingSmiles);
+      if (!engine.valid || !engine.canonical_smiles) {
+        setError(engine.error || 'The retrosynthesis engine could not process this structure.');
+        setIsLoading(false);
+        return;
+      }
+      const canonical = engine.canonical_smiles;
 
+      // 3. Pull live properties from PubChem using the canonical SMILES if we
+      //    don't already have a curated entry.
+      if (!molecule) {
+        molecule = await fetchFromPubChemBySmiles(canonical);
+      }
+      if (!molecule) {
+        const d = engine.descriptors ?? {};
+        molecule = {
+          name: isSmiles ? (d.formula || canonical) : raw,
+          smiles: canonical,
+          iupac: '',
+          mw: d.mw ?? 0,
+          xlogp: 0,
+          hbd: 0,
+          rings: d.rings ?? 0,
+          source: 'ai-inferred',
+        };
+      }
+      molecule.canonicalSmiles = canonical;
+
+      const routes = adaptEngineRoutes(
+        engine.routes ?? [],
+        engine.engine ?? 'llm-gemini-v1',
+        location,
+        batchSize,
+        molecule.mw || 150,
+      );
+      if (routes.length === 0) {
+        setError('The retrosynthesis engine returned no routes for this structure.');
+        setIsLoading(false);
+        return;
+      }
+
+      const regulatory = getRegulatory(location);
       setResults({
         molecule, location, regulatory, routes,
         recommendedRouteId: routes[0].id,
         agentExplanation: '',
         batchSizeMg: batchSize,
       });
-    } catch {
-      setError('Pipeline error. Please try again.');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Pipeline error.';
+      console.error('Pipeline error:', e);
+      setError(msg);
     }
     setIsLoading(false);
   };
