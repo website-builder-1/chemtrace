@@ -32,6 +32,12 @@ export interface ReagentInfo {
   geoRisk: RiskLevel;
   status: 'PREFERRED' | 'STANDARD' | 'RESTRICTED' | 'BLOCKED';
   exportControlled: boolean;
+  /** Optional direct link to the supplier product page. If omitted, the UI builds a search URL from the supplier name + CAS. */
+  productUrl?: string;
+  /** Optional pricing breakdown for clarity (unit price, pack size, currency). */
+  unitPrice?: number;
+  packSize?: string;
+  priceCurrency?: 'GBP' | 'USD' | 'EUR';
 }
 
 export interface SynthesisRoute {

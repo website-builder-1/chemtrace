@@ -1,5 +1,7 @@
 import type { PipelineResults } from '@/types/chemtrace';
 import SectionLabel from './SectionLabel';
+import { ExternalLink } from 'lucide-react';
+import { buildSupplierUrl } from '@/lib/supplierLinks';
 
 const statusChip = (s: string) => {
   const map: Record<string, { bg: string; text: string; icon: string }> = {
@@ -78,9 +80,31 @@ export default function SupplyChainSection({ results }: { results: PipelineResul
                 >
                   <td className="font-body text-[0.79rem] px-2 py-1.5" style={{ color: 'hsl(var(--ct-ink))' }}>{r.name}</td>
                   <td className="font-mono-data text-[0.72rem] px-2 py-1.5" style={{ color: 'hsl(var(--ct-ink))' }}>{r.cas}</td>
-                  <td className="font-body text-[0.79rem] px-2 py-1.5">{r.supplier}</td>
+                  <td className="font-body text-[0.79rem] px-2 py-1.5">
+                    <a
+                      href={buildSupplierUrl(r.supplier, r.cas, r.name, r.productUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 hover:underline"
+                      style={{ color: 'hsl(var(--ct-teal))' }}
+                      title={`Open ${r.supplier} product page for ${r.name}`}
+                    >
+                      {r.supplier} <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+                  </td>
                   <td className="font-body text-[0.79rem] px-2 py-1.5">{r.country}</td>
-                  <td className="font-mono-data text-[0.72rem] px-2 py-1.5">{r.price}</td>
+                  <td className="font-mono-data text-[0.72rem] px-2 py-1.5">
+                    <a
+                      href={buildSupplierUrl(r.supplier, r.cas, r.name, r.productUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                      style={{ color: 'hsl(var(--ct-ink))' }}
+                      title="Verify live price on supplier site"
+                    >
+                      {r.price}
+                    </a>
+                  </td>
                   <td className="font-body text-[0.79rem] px-2 py-1.5">{r.availability}</td>
                   <td className="font-mono-data text-[0.72rem] px-2 py-1.5 text-center">{r.leadDays}</td>
                   <td className="font-body text-[0.72rem] px-2 py-1.5">{r.hazard}</td>
@@ -99,6 +123,10 @@ export default function SupplyChainSection({ results }: { results: PipelineResul
           </tbody>
         </table>
       </div>
+
+      <p className="font-body italic text-[0.7rem] mt-3" style={{ color: 'hsl(var(--ct-muted))' }}>
+        Prices shown are indicative list prices captured at the time of curation in the listed pack size and currency. Supplier and price columns link out to the supplier's product search — confirm live pricing, pack size, lead time, and shipping restrictions before placing an order.
+      </p>
     </section>
   );
 }
