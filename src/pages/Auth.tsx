@@ -11,7 +11,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    document.title = mode === 'login' ? 'Sign in — ChemTrace' : 'Create account — ChemTrace';
+    document.title = mode === 'login' ? 'Sign in — Chemtraceit' : 'Create account — Chemtraceit';
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) navigate('/');
     });
@@ -49,7 +49,7 @@ export default function Auth() {
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
           <div className="font-serif-display text-4xl mb-2" style={{ color: 'hsl(var(--ct-teal))' }}>⚗</div>
-          <h1 className="font-serif-display font-bold text-2xl" style={{ color: 'hsl(var(--ct-ink))' }}>ChemTrace</h1>
+          <h1 className="font-serif-display font-bold text-2xl" style={{ color: 'hsl(var(--ct-ink))' }}>Chemtraceit</h1>
           <p className="font-mono-data uppercase text-[0.6rem] tracking-[0.15em] mt-1" style={{ color: 'hsl(var(--ct-muted))' }}>
             SYNTHESIS INTELLIGENCE
           </p>
@@ -129,7 +129,7 @@ export default function Auth() {
         </div>
 
         <p className="font-body text-xs text-center mt-4" style={{ color: 'hsl(var(--ct-muted))' }}>
-          By continuing you agree to ChemTrace research-use terms.
+          By continuing you agree to Chemtraceit research-use terms.
         </p>
       </div>
     </div>
