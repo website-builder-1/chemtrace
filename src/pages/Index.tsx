@@ -38,7 +38,7 @@ function SidebarBody(p: SidebarBodyProps) {
   return (
     <div className="flex flex-col h-full p-5 overflow-y-auto" style={{ backgroundColor: 'hsl(var(--ct-sidebar))' }}>
       <div className="mb-1">
-        <div className="font-serif-display font-bold text-xl" style={{ color: 'hsl(var(--ct-teal))' }}>⚗ ChemTrace</div>
+        <div className="font-serif-display font-bold text-xl" style={{ color: 'hsl(var(--ct-teal))' }}>⚗ Chemtraceit</div>
         <div className="font-mono-data uppercase text-[0.55rem] tracking-[0.15em]" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>SYNTHESIS INTELLIGENCE</div>
       </div>
 
@@ -115,7 +115,7 @@ function SidebarBody(p: SidebarBodyProps) {
           className="w-full px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] text-white transition-colors duration-150 disabled:opacity-50"
           style={{ backgroundColor: 'hsl(var(--ct-teal))', minHeight: '44px' }}
         >
-          {p.isLoading ? 'Running…' : 'Run ChemTrace →'}
+          {p.isLoading ? 'Running…' : 'Run Chemtraceit →'}
         </button>
 
         {p.userEmail && p.hasResults && (
@@ -271,7 +271,7 @@ export default function Index() {
         className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3"
         style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderBottom: '2px solid hsl(var(--ct-teal))' }}
       >
-        <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-teal))' }}>⚗ ChemTrace</span>
+        <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-teal))' }}>⚗ Chemtraceit</span>
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <button aria-label="Open menu" className="flex items-center justify-center rounded-[3px] text-white" style={{ minWidth: '44px', minHeight: '44px' }}>
@@ -306,7 +306,7 @@ export default function Index() {
               <div className="font-serif-display text-5xl sm:text-6xl mb-3" style={{ color: 'hsl(var(--ct-teal))' }}>⚗</div>
               <h1 className="font-serif-display font-bold text-xl sm:text-2xl mb-3" style={{ color: 'hsl(var(--ct-ink))', lineHeight: 1.2 }}>Autonomous Reaction Scouting</h1>
               <p className="font-body text-sm sm:text-base leading-[1.7] mb-5" style={{ color: 'hsl(var(--ct-muted))' }}>
-                Enter a molecule name or SMILES string. ChemTrace evaluates synthesis routes, checks reagent supply chains, assesses regulatory compliance, and recommends the optimal pathway for your production location and batch size.
+                Enter a molecule name or SMILES string. Chemtraceit evaluates synthesis routes, checks reagent supply chains, assesses regulatory compliance, and recommends the optimal pathway for your production location and batch size.
               </p>
               <div className="border rounded-[3px] p-4 bg-card" style={{ borderColor: 'hsl(var(--ct-border))' }}>
                 <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-2" style={{ color: 'hsl(var(--ct-muted))' }}>CURATED MOLECULES — NO SETUP NEEDED</div>
