@@ -43,6 +43,12 @@ export default function MoleculeIdentityBar({ results }: { results: PipelineResu
             <ProvenanceBadge source={molecule.source} />
           </div>
           <div className="font-mono-data text-sm mt-1 break-all" style={{ color: 'hsl(var(--ct-teal))' }}>{molecule.smiles}</div>
+          {molecule.canonicalSmiles && molecule.canonicalSmiles !== molecule.smiles && (
+            <div className="mt-1">
+              <span className="font-mono-data uppercase text-[0.55rem] tracking-wider mr-1" style={{ color: 'hsl(var(--ct-muted))' }}>CANONICAL (RDKit):</span>
+              <span className="font-mono-data text-xs break-all" style={{ color: 'hsl(var(--ct-ink))' }}>{molecule.canonicalSmiles}</span>
+            </div>
+          )}
           {molecule.iupac && (
             <div className="font-body text-xs italic mt-1" style={{ color: 'hsl(var(--ct-muted))' }}>{molecule.iupac}</div>
           )}
