@@ -176,7 +176,6 @@ async function runRetrosynthesisEngine(
             { role: "system", content: system },
             { role: "user", content: user },
           ],
-          response_format: { type: "json_object" },
           temperature: 0.2,
           max_tokens: 4096,
         }),
