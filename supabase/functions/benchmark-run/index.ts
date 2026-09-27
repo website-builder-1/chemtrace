@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
   const { data: cases } = await admin.from("benchmark_cases").select("*").order("id");
   // deno-lint-ignore no-explicit-any
   const results: any[] = [];
-  for (const c of cases ?? []) {
+  await Promise.all((cases ?? []).map(async (c) => {
     const e = c.expected;
     const t0 = Date.now();
     let pass = false; let detail = ""; let evidenceCount = 0; let citationsOk: boolean | null = null;
@@ -61,7 +61,8 @@ Deno.serve(async (req) => {
       }
     } catch (err) { detail = String(err).slice(0, 200); }
     results.push({ id: c.id, category: c.category, pass, detail, evidenceCount, citationsOk, ms: Date.now() - t0 });
-  }
+  }));
+  results.sort((a, b) => a.id.localeCompare(b.id));
   const by = (cat: string[]) => { const r = results.filter((x) => cat.includes(x.category)); return r.length ? Math.round((r.filter((x) => x.pass).length / r.length) * 100) : null; };
   const qa = results.filter((x) => x.citationsOk !== null);
   const summary = {
