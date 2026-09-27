@@ -26,7 +26,7 @@ const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 const HF_MODELS = [
   "meta-llama/Llama-3.3-70B-Instruct:fastest",
   "Qwen/Qwen2.5-72B-Instruct:fastest",
-  "Qwen/Qwen2.5-7B-Instruct:fastest",
+  "meta-llama/Llama-3.1-8B-Instruct:fastest",
 ];
 
 // ── RDKit (lazy singleton, reused across invocations) ────────────────────
@@ -154,7 +154,7 @@ async function runRetrosynthesisEngine(
     `Prefer commercially available starting materials. Every reaction must be ` +
     `chemically correct and atom-plausible (e.g. hydrolysis of ethylene oxide gives ethylene glycol, NOT ethanol). ` +
     `For simple industrial chemicals, include the real industrial process. `+
-    `Reaction SMILES MUST be ` +
+    `Reaction SMILES MUST be atom-balanced: list EVERY reactant (including water, H2, oxidants) on the left and the product plus by-products (H2O, HCl, CO2...) on the right. Reaction SMILES MUST be ` +
     `"reactants>>product". Do not invent CAS numbers. Output JSON only, ` +
     `matching this TypeScript shape: { routes: Array<{ name: string; score: number; ` +
     `yieldPercent?: number; complexity?: number; decisionReason?: string; ` +
@@ -170,7 +170,11 @@ async function runRetrosynthesisEngine(
   // unavailable provider never blocks the whole request.
   const deadline = Date.now() + 110_000;
   let lastErr: unknown = null;
-  for (const model of HF_MODELS) {
+  const attempts: Array<{ model: string; feedback?: boolean }> = [];
+  for (const m of HF_MODELS) attempts.push({ model: m }, { model: m, feedback: true });
+  let feedbackMsg = "";
+  for (const { model, feedback } of attempts) {
+    if (feedback && !feedbackMsg) continue;
     const remaining = deadline - Date.now();
     if (remaining < 5_000) break;
     const controller = new AbortController();
@@ -187,7 +191,7 @@ async function runRetrosynthesisEngine(
           model,
           messages: [
             { role: "system", content: system },
-            { role: "user", content: user },
+            { role: "user", content: feedback ? user + feedbackMsg : user },
           ],
           temperature: 0.2,
           max_tokens: 3000,
@@ -203,8 +207,21 @@ async function runRetrosynthesisEngine(
       const raw = data?.choices?.[0]?.message?.content ?? "";
       const parsed = typeof raw === "string" ? extractJson(raw) : raw;
       if (parsed && Array.isArray(parsed.routes) && parsed.routes.length) {
-        usedModel = model;
-        return parsed;
+        const good = await filterBalancedRoutes(parsed.routes, canonicalSmiles);
+        feedbackMsg = "";
+        if (!good.length) {
+          feedbackMsg = `\n\nYour previous answer was rejected by an automatic atom-balance check:\n- ${lastRejections.slice(0, 6).join("\n- ")}\n` +
+            `Use valid SMILES only (no formulas like C6H6, no '+' signs; separate molecules with '.'). ` +
+            `Every route must end in the target ${canonicalSmiles}, and each reaction must be chemically correct and atom-balanced.`;
+        }
+        lastRejections = [];
+        if (good.length) {
+          usedModel = model;
+          return { routes: good };
+        }
+        lastErr = new Error("No chemically consistent route found (every suggested route failed the atom-balance check). Please try again.");
+        console.error(`model ${model}: all routes failed atom check`);
+        continue;
       }
       lastErr = new Error(`Model ${model} returned unparseable output`);
       console.error(String(lastErr));
@@ -232,7 +249,169 @@ function extractJson(raw: string): any {
   return null;
 }
 
+// ── Atom-balance check ───────────────────────────────────────────────────
+// Every step's reaction SMILES must conserve atoms: whatever the reactants
+// contain beyond the product must be explainable as common by-products
+// (water, HCl, CO2, salts…). Hydrogen may only be added when the step is a
+// reduction, and oxygen/hydrogen only removed when it is an oxidation.
+// This rejects e.g. "ethylene oxide + water → ethanol" (a stray O atom).
+
+type Counts = Record<string, number>;
+
+async function atomCounts(smiles: string): Promise<Counts | null> {
+  if (!smiles || !smiles.trim()) return null;
+  const RDKit = await getRDKit();
+  const mol = RDKit.get_mol(smiles.trim());
+  if (!mol || !mol.is_valid()) { try { mol?.delete(); } catch { /* */ } return null; }
+  try {
+    const block: string = mol.add_hs();
+    const lines = block.split("\n");
+    const counts: Counts = {};
+    const header = lines[3] ?? "";
+    if (header.includes("V3000")) {
+      for (const l of lines) {
+        const m = l.match(/^M {2}V30 \d+ ([A-Z][a-z]?) /);
+        if (m) counts[m[1]] = (counts[m[1]] ?? 0) + 1;
+      }
+    } else {
+      const n = parseInt(header.slice(0, 3), 10);
+      for (let i = 0; i < n; i++) {
+        const el = (lines[4 + i] ?? "").slice(31, 34).trim();
+        if (el) counts[el] = (counts[el] ?? 0) + 1;
+      }
+    }
+    return counts;
+  } finally { mol.delete(); }
+}
+
+async function canon(smiles: string): Promise<string | null> {
+  const RDKit = await getRDKit();
+  const mol = RDKit.get_mol(smiles.trim());
+  if (!mol || !mol.is_valid()) { try { mol?.delete(); } catch { /* */ } return null; }
+  const c = mol.get_smiles(); mol.delete(); return c;
+}
+
+const METALS = ["Na", "K", "Li", "Mg", "Zn", "Cs", "Ca", "Cu", "Ag", "Al", "B", "Sn"];
+const BASE_BYPRODUCTS: Counts[] = [
+  { H: 2, O: 1 }, { H: 1, Cl: 1 }, { H: 1, Br: 1 }, { H: 1, I: 1 }, { H: 1, F: 1 },
+  { C: 1, O: 2 }, { C: 1, O: 1 }, { N: 1, H: 3 }, { N: 2 }, { C: 1, H: 4, O: 1 },
+  { C: 2, H: 6, O: 1 }, { C: 2, H: 4, O: 2 }, { S: 1, O: 2 }, { H: 2, S: 1, O: 4 },
+  { H: 3, P: 1, O: 4 }, { C: 4, H: 10, O: 1 }, { C: 3, H: 6, O: 1 },
+  ...METALS.flatMap((m) => [{ [m]: 1 }, { [m]: 1, Cl: 1 }, { [m]: 1, Br: 1 }, { [m]: 1, I: 1 }, { [m]: 1, O: 1, H: 1 }]),
+];
+const REDUCTIVE = /reduc|hydrogenat|hydrogenoly|\bH2\b|H₂|NaBH4|LiAlH4|hydride|DIBAL|Pd\/C|Raney|Birch|Wolff|Clemmensen/i;
+const OXIDATIVE = /oxid|dehydrogen|KMnO4|CrO3|PCC|PDC|Swern|Jones|peroxide|H2O2|mCPBA|\bO2\b|ozon|NaOCl|TEMPO|Dess|air/i;
+
+function decomposable(left: Counts, byproducts: Counts[], depth = 0): boolean {
+  const keys = Object.keys(left).filter((k) => left[k] !== 0);
+  if (keys.length === 0) return true;
+  if (keys.some((k) => left[k] < 0) || depth > 12) return false;
+  for (const b of byproducts) {
+    if (Object.entries(b).every(([k, v]) => (left[k] ?? 0) >= v)) {
+      const next = { ...left };
+      for (const [k, v] of Object.entries(b)) next[k] -= v;
+      if (decomposable(next, byproducts, depth + 1)) return true;
+    }
+  }
+  return false;
+}
+
+// Free models often write condensed formulas ("C6H5CHO+H2") instead of
+// SMILES. Repair the common patterns so the check can still run.
+const FRAGMENT_FIX: Record<string, string> = {
+  H2O: "O", H2: "[H][H]", HCl: "Cl", HBr: "Br", HI: "I", HF: "F", NH3: "N", CO2: "O=C=O",
+  CO: "[C-]#[O+]", O2: "O=O", N2: "N#N", H2SO4: "OS(=O)(=O)O", NaOH: "[Na+].[OH-]",
+  KOH: "[K+].[OH-]", NaCl: "[Na+].[Cl-]", AlCl3: "Cl[Al](Cl)Cl", C6H6: "c1ccccc1",
+};
+async function repairSmiles(side: string): Promise<string> {
+  const RDKit = await getRDKit();
+  const frags = side.replace(/\s*\+\s*/g, ".").split(".").filter(Boolean);
+  const out: string[] = [];
+  for (let f of frags) {
+    f = f.trim().replace(/^\d+(?=[A-Z])/, ""); // strip stoichiometric coefficients
+    const test = RDKit.get_mol(f);
+    const valid = test && test.is_valid();
+    try { test?.delete(); } catch { /* */ }
+    if (valid && !/^[A-Z][a-z]?\d/.test(f)) { out.push(f); continue; }
+    if (FRAGMENT_FIX[f]) { out.push(FRAGMENT_FIX[f]); continue; }
+    const fixed = f.replace(/C6H5/g, "c1ccccc1").replace(/COOH/g, "C(=O)O").replace(/COO/g, "C(=O)O")
+      .replace(/CHO/g, "C=O").replace(/CH3|CH2|CH(?![a-z])/g, "C").replace(/NH2/g, "N").replace(/OH/g, "O");
+    out.push(fixed);
+  }
+  return out.join(".");
+}
+
+// deno-lint-ignore no-explicit-any
+async function checkStep(step: any): Promise<"balanced" | "unchecked" | string> {
+  const rxn: string | undefined = step.reactionSmiles;
+  if (!rxn || !rxn.includes(">")) return "unchecked";
+  const parts = rxn.split(">");
+  const lhs = await repairSmiles(parts[0]), rhs = await repairSmiles(parts[parts.length - 1]);
+  step.reactionSmiles = `${lhs}>>${rhs}`;
+  const r = await atomCounts(lhs);
+  const p = await atomCounts(rhs);
+  if (!r || !p) return "reaction SMILES could not be parsed";
+  const lhsCanon = await Promise.all(lhs.split(".").map(canon));
+  const mainProduct = await canon(rhs.split(".").sort((a, b) => b.length - a.length)[0] ?? "");
+  if (mainProduct && lhsCanon.includes(mainProduct)) return "product is already one of the reactants";
+  const text = `${step.description ?? ""} ${JSON.stringify(step.conditions ?? {})}`;
+  const reductive = REDUCTIVE.test(text), oxidative = OXIDATIVE.test(text);
+  const left: Counts = {};
+  for (const k of new Set([...Object.keys(r), ...Object.keys(p)])) left[k] = (r[k] ?? 0) - (p[k] ?? 0);
+  // Missing reagent atoms that the named chemistry legitimately supplies.
+  if (reductive && (left.H ?? 0) < 0) left.H = 0;
+  if (oxidative && (left.O ?? 0) < 0) left.O = 0;
+  const byproducts: Counts[] = oxidative ? [...BASE_BYPRODUCTS, { H: 2 }, { H: 1 }] : [...BASE_BYPRODUCTS];
+  if (reductive && (left.H ?? 0) > 0) byproducts.push({ H: 1 });
+  const deficit = Object.entries(left).filter(([, v]) => v < 0).map(([k]) => k);
+  if (deficit.length) return `product has atoms (${deficit.join(", ")}) not present in reactants`;
+  if (!decomposable(left, byproducts)) {
+    const extra = Object.entries(left).filter(([, v]) => v > 0).map(([k, v]) => `${k}${v}`).join(" ");
+    return `atoms don't add up — unexplained leftover ${extra}`;
+  }
+  return "balanced";
+}
+
+// Returns only routes whose every checkable step balances and whose final
+// product is the target. Annotates each step with its atomCheck result.
+// deno-lint-ignore no-explicit-any
+async function filterBalancedRoutes(routes: any[], canonical: string): Promise<any[]> {
+  // deno-lint-ignore no-explicit-any
+  const ok: any[] = [];
+  for (const route of routes) {
+    const steps = Array.isArray(route.steps) ? route.steps : [];
+    if (!steps.length) continue;
+    let pass = true;
+    for (const s of steps) {
+      const res = await checkStep(s);
+      s.atomCheck = res === "balanced" || res === "unchecked" ? res : "failed";
+      if (s.atomCheck === "failed") {
+        console.warn(`rejected route "${route.name}": ${res} [${s.reactionSmiles}]`);
+        lastRejections.push(`"${route.name}" step "${s.reactionSmiles}": ${res}`);
+        pass = false; break;
+      }
+    }
+    if (!pass) continue;
+    const last = steps[steps.length - 1];
+    const finalSmi = last.productSmiles ?? last.smiles ??
+      (last.reactionSmiles ? last.reactionSmiles.split(">").pop() : undefined);
+    if (finalSmi) {
+      const frags = await Promise.all(String(finalSmi).split(".").map(canon));
+      if (!frags.includes(canonical)) {
+        console.warn(`rejected route "${route.name}": final product ${finalSmi} is not the target`);
+        lastRejections.push(`"${route.name}": final product ${finalSmi} is not the target ${canonical}`);
+        continue;
+      }
+    }
+    ok.push(route);
+  }
+  return ok;
+}
+
+let lastRejections: string[] = [];
+
 // ── Response shaping ─────────────────────────────────────────────────────
+
 
 // deno-lint-ignore no-explicit-any
 function shapeRoutes(engineOutput: any, canonical: string) {
@@ -252,6 +431,7 @@ function shapeRoutes(engineOutput: any, canonical: string) {
       reactionSmiles: s.reactionSmiles,
       confidence: typeof s.confidence === "number" ? s.confidence : undefined,
       conditions: s.conditions ?? undefined,
+      atomCheck: s.atomCheck,
     })),
   }));
 }
@@ -316,7 +496,10 @@ Deno.serve(async (req) => {
         .select("payload, engine, created_at")
         .eq("canonical_smiles", v.canonical)
         .maybeSingle();
-      if (cached?.payload) {
+      const cachedOk = Array.isArray(cached?.payload)
+        ? await filterBalancedRoutes(cached!.payload, v.canonical) : [];
+      if (cachedOk.length) {
+        cached!.payload = cachedOk;
         return new Response(
           JSON.stringify({
             valid: true,
