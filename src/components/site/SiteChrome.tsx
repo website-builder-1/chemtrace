@@ -54,7 +54,6 @@ export function SiteFooter() {
         <div className="font-mono-data text-xs flex flex-col gap-2" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>
           <Link to="/app">Launch the tool</Link>
           <Link to="/research">Ask a chemistry question</Link>
-          <Link to="/benchmark">Accuracy benchmark</Link>
           <Link to="/team">Meet the team</Link>
           <Link to="/auth">Sign in / Sign up</Link>
         </div>

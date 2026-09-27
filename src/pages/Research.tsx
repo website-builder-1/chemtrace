@@ -113,7 +113,7 @@ export default function Research() {
           </div>
         </form>
 
-        {loading && <p className="font-mono-data text-xs mt-4" style={muted}>Checking databases, literature and chemistry tools… this can take 20–60 seconds on free AI models.</p>}
+        {loading && <p className="font-mono-data text-xs mt-4" style={muted}>Scanning using ChemTraceIt's Chemistry Artificial Intelligence Engine… this can take up to a minute.</p>}
 
         {res && (
           <div className="mt-8 space-y-6">
