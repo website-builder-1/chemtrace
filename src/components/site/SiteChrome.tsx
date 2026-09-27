@@ -4,6 +4,7 @@ import { Menu, X, FlaskConical } from 'lucide-react';
 
 const links = [
   { to: '/', label: 'Home' },
+  { to: '/research', label: 'Research' },
   { to: '/team', label: 'Team' },
   { to: '/#contact', label: 'Contact' },
 ];
@@ -52,6 +53,8 @@ export function SiteFooter() {
         </div>
         <div className="font-mono-data text-xs flex flex-col gap-2" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>
           <Link to="/app">Launch the tool</Link>
+          <Link to="/research">Ask a chemistry question</Link>
+          <Link to="/benchmark">Accuracy benchmark</Link>
           <Link to="/team">Meet the team</Link>
           <Link to="/auth">Sign in / Sign up</Link>
         </div>

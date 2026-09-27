@@ -14,6 +14,389 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_providers: {
+        Row: {
+          base_url: string
+          enabled: boolean
+          id: string
+          kind: string
+          notes: string | null
+          secret_name: string
+        }
+        Insert: {
+          base_url: string
+          enabled?: boolean
+          id: string
+          kind?: string
+          notes?: string | null
+          secret_name: string
+        }
+        Update: {
+          base_url?: string
+          enabled?: boolean
+          id?: string
+          kind?: string
+          notes?: string | null
+          secret_name?: string
+        }
+        Relationships: []
+      }
+      benchmark_cases: {
+        Row: {
+          category: string
+          expected: Json
+          id: string
+          notes: string | null
+          question: string
+        }
+        Insert: {
+          category: string
+          expected: Json
+          id: string
+          notes?: string | null
+          question: string
+        }
+        Update: {
+          category?: string
+          expected?: Json
+          id?: string
+          notes?: string | null
+          question?: string
+        }
+        Relationships: []
+      }
+      benchmark_runs: {
+        Row: {
+          created_at: string
+          engine_version: string | null
+          id: string
+          results: Json
+          summary: Json
+        }
+        Insert: {
+          created_at?: string
+          engine_version?: string | null
+          id?: string
+          results: Json
+          summary: Json
+        }
+        Update: {
+          created_at?: string
+          engine_version?: string | null
+          id?: string
+          results?: Json
+          summary?: Json
+        }
+        Relationships: []
+      }
+      compound_synonyms: {
+        Row: {
+          compound_id: string
+          synonym: string
+        }
+        Insert: {
+          compound_id: string
+          synonym: string
+        }
+        Update: {
+          compound_id?: string
+          synonym?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compound_synonyms_compound_id_fkey"
+            columns: ["compound_id"]
+            isOneToOne: false
+            referencedRelation: "compounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compounds: {
+        Row: {
+          canonical_smiles: string
+          formula: string | null
+          id: string
+          inchi: string | null
+          inchikey: string | null
+          mw: number | null
+          name: string | null
+          properties: Json
+          pubchem_cid: number | null
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          canonical_smiles: string
+          formula?: string | null
+          id?: string
+          inchi?: string | null
+          inchikey?: string | null
+          mw?: number | null
+          name?: string | null
+          properties?: Json
+          pubchem_cid?: number | null
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          canonical_smiles?: string
+          formula?: string | null
+          id?: string
+          inchi?: string | null
+          inchikey?: string | null
+          mw?: number | null
+          name?: string | null
+          properties?: Json
+          pubchem_cid?: number | null
+          source?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          answer: string
+          correction: string | null
+          created_at: string
+          id: string
+          question: string
+          rating: string
+          reason: string | null
+          source: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          correction?: string | null
+          created_at?: string
+          id?: string
+          question: string
+          rating: string
+          reason?: string | null
+          source?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          correction?: string | null
+          created_at?: string
+          id?: string
+          question?: string
+          rating?: string
+          reason?: string | null
+          source?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      graph_edges: {
+        Row: {
+          from_id: string
+          from_type: string
+          id: string
+          relation: string
+          source: string | null
+          to_id: string
+          to_type: string
+        }
+        Insert: {
+          from_id: string
+          from_type: string
+          id?: string
+          relation: string
+          source?: string | null
+          to_id: string
+          to_type: string
+        }
+        Update: {
+          from_id?: string
+          from_type?: string
+          id?: string
+          relation?: string
+          source?: string | null
+          to_id?: string
+          to_type?: string
+        }
+        Relationships: []
+      }
+      literature_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          doc_id: string
+          embed_model: string | null
+          embedding: string | null
+          id: string
+          tsv: unknown
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          doc_id: string
+          embed_model?: string | null
+          embedding?: string | null
+          id?: string
+          tsv?: unknown
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          doc_id?: string
+          embed_model?: string | null
+          embedding?: string | null
+          id?: string
+          tsv?: unknown
+        }
+        Relationships: [
+          {
+            foreignKeyName: "literature_chunks_doc_id_fkey"
+            columns: ["doc_id"]
+            isOneToOne: false
+            referencedRelation: "literature_docs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      literature_docs: {
+        Row: {
+          abstract: string | null
+          created_at: string
+          doi: string | null
+          entities: string[]
+          external_id: string
+          id: string
+          journal: string | null
+          source: string
+          title: string
+          url: string | null
+          year: number | null
+        }
+        Insert: {
+          abstract?: string | null
+          created_at?: string
+          doi?: string | null
+          entities?: string[]
+          external_id: string
+          id?: string
+          journal?: string | null
+          source: string
+          title: string
+          url?: string | null
+          year?: number | null
+        }
+        Update: {
+          abstract?: string | null
+          created_at?: string
+          doi?: string | null
+          entities?: string[]
+          external_id?: string
+          id?: string
+          journal?: string | null
+          source?: string
+          title?: string
+          url?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      model_routes: {
+        Row: {
+          enabled: boolean
+          model: string
+          priority: number
+          provider_id: string
+          task: string
+        }
+        Insert: {
+          enabled?: boolean
+          model: string
+          priority?: number
+          provider_id: string
+          task: string
+        }
+        Update: {
+          enabled?: boolean
+          model?: string
+          priority?: number
+          provider_id?: string
+          task?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_routes_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "ai_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_type: string
+          payload: Json
+          project_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_type: string
+          payload?: Json
+          project_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_type?: string
+          payload?: Json
+          project_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           client_key: string
@@ -29,6 +412,166 @@ export type Database = {
           client_key?: string
           created_at?: string
           id?: number
+        }
+        Relationships: []
+      }
+      reaction_conditions: {
+        Row: {
+          atmosphere: string | null
+          catalyst: string | null
+          evidence_level: string
+          id: string
+          pressure: string | null
+          reaction_id: string | null
+          reagents: string | null
+          solvent: string | null
+          source: string | null
+          temperature: string | null
+          time: string | null
+          yield_percent: number | null
+        }
+        Insert: {
+          atmosphere?: string | null
+          catalyst?: string | null
+          evidence_level?: string
+          id?: string
+          pressure?: string | null
+          reaction_id?: string | null
+          reagents?: string | null
+          solvent?: string | null
+          source?: string | null
+          temperature?: string | null
+          time?: string | null
+          yield_percent?: number | null
+        }
+        Update: {
+          atmosphere?: string | null
+          catalyst?: string | null
+          evidence_level?: string
+          id?: string
+          pressure?: string | null
+          reaction_id?: string | null
+          reagents?: string | null
+          solvent?: string | null
+          source?: string | null
+          temperature?: string | null
+          time?: string | null
+          yield_percent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reaction_conditions_reaction_id_fkey"
+            columns: ["reaction_id"]
+            isOneToOne: false
+            referencedRelation: "reactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reaction_participants: {
+        Row: {
+          name: string | null
+          reaction_id: string
+          role: string
+          smiles: string
+        }
+        Insert: {
+          name?: string | null
+          reaction_id: string
+          role: string
+          smiles: string
+        }
+        Update: {
+          name?: string | null
+          reaction_id?: string
+          role?: string
+          smiles?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reaction_participants_reaction_id_fkey"
+            columns: ["reaction_id"]
+            isOneToOne: false
+            referencedRelation: "reactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reactions: {
+        Row: {
+          created_at: string
+          doi: string | null
+          evidence_level: string
+          id: string
+          name: string | null
+          product_smiles: string
+          reaction_class: string | null
+          reaction_smiles: string
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          doi?: string | null
+          evidence_level?: string
+          id?: string
+          name?: string | null
+          product_smiles: string
+          reaction_class?: string | null
+          reaction_smiles: string
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          doi?: string | null
+          evidence_level?: string
+          id?: string
+          name?: string | null
+          product_smiles?: string
+          reaction_class?: string | null
+          reaction_smiles?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
+      request_log: {
+        Row: {
+          client_key: string | null
+          created_at: string
+          detail: string | null
+          function_name: string
+          id: number
+          latency_ms: number | null
+          model: string | null
+          ok: boolean | null
+          provider: string | null
+          task: string | null
+          user_id: string | null
+        }
+        Insert: {
+          client_key?: string | null
+          created_at?: string
+          detail?: string | null
+          function_name: string
+          id?: number
+          latency_ms?: number | null
+          model?: string | null
+          ok?: boolean | null
+          provider?: string | null
+          task?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          client_key?: string | null
+          created_at?: string
+          detail?: string | null
+          function_name?: string
+          id?: number
+          latency_ms?: number | null
+          model?: string | null
+          ok?: boolean | null
+          provider?: string | null
+          task?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -92,6 +635,72 @@ export type Database = {
         }
         Relationships: []
       }
+      search_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          payload: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          payload: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          payload?: Json
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      validated_facts: {
+        Row: {
+          created_at: string
+          id: string
+          origin: string
+          source: string
+          statement: string
+          subject: string
+          validated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          origin: string
+          source: string
+          statement: string
+          subject: string
+          validated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          origin?: string
+          source?: string
+          statement?: string
+          subject?: string
+          validated_by?: string | null
+        }
+        Relationships: []
+      }
       verified_routes: {
         Row: {
           canonical_smiles: string
@@ -127,10 +736,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      hybrid_search_chunks: {
+        Args: {
+          match_count?: number
+          query_embedding: string
+          query_text: string
+        }
+        Returns: {
+          chunk_id: string
+          content: string
+          doc_id: string
+          score: number
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -257,6 +885,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
