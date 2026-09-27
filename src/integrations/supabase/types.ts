@@ -92,6 +92,36 @@ export type Database = {
         }
         Relationships: []
       }
+      verified_routes: {
+        Row: {
+          canonical_smiles: string
+          common_name: string
+          created_at: string
+          id: string
+          references_text: string | null
+          routes: Json
+          updated_at: string
+        }
+        Insert: {
+          canonical_smiles: string
+          common_name: string
+          created_at?: string
+          id?: string
+          references_text?: string | null
+          routes: Json
+          updated_at?: string
+        }
+        Update: {
+          canonical_smiles?: string
+          common_name?: string
+          created_at?: string
+          id?: string
+          references_text?: string | null
+          routes?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
