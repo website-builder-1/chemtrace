@@ -1,6 +1,7 @@
 // Chemical Intelligence orchestrator: safety → analyse → tools/retrieval → compose → verify.
 // The LLM only reasons over evidence gathered by deterministic tools and databases.
 import { z } from "npm:zod@3";
+import { hasPlatformAccess } from "../_shared/access.ts";
 import { adminClient, chat, corsHeaders, extractJson, json, rateLimited } from "../_shared/aiRouter.ts";
 import { canonical, descriptors, functionalGroups } from "../_shared/chem.ts";
 import { resolveCompound } from "../_shared/compounds.ts";
