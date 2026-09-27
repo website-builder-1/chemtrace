@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { adminClient } from "../_shared/aiRouter.ts";
+import { hasPlatformAccess } from "../_shared/access.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,6 +15,9 @@ const PROVIDERS = [
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (!(await hasPlatformAccess(adminClient(), req))) {
+    return new Response(JSON.stringify({ error: "Please sign in to use Chemtraceit." }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
 
   try {
     const { messages, context, type } = await req.json();

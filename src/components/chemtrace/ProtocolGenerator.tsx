@@ -1,3 +1,4 @@
+import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
 import type { PipelineResults } from '@/types/chemtrace';
 import ReactMarkdown from 'react-markdown';
@@ -20,7 +21,7 @@ export default function ProtocolGenerator({ results }: { results: PipelineResult
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           messages: [{ role: 'user', content: prompt }],

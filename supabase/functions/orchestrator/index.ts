@@ -29,6 +29,7 @@ Deno.serve(async (req) => {
   const p = Body.safeParse(await req.json().catch(() => ({})));
   if (!p.success) return json({ error: p.error.flatten() }, 400);
   const admin = adminClient();
+  if (!(await hasPlatformAccess(admin, req))) return json({ error: "Please sign in to use Chemtraceit." }, 401);
   if (await rateLimited(admin, req, "orchestrator", 8, 120_000)) return json({ error: "You're asking quickly — please wait a moment and try again." }, 429);
 
   const { question } = p.data;
