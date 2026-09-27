@@ -13,7 +13,7 @@ export default function Auth() {
   useEffect(() => {
     document.title = mode === 'login' ? 'Sign in — Chemtraceit' : 'Create account — Chemtraceit';
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate('/');
+      if (session) navigate('/app');
     });
   }, [mode, navigate]);
 
@@ -35,7 +35,7 @@ export default function Auth() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success('Signed in.');
-        navigate('/');
+        navigate('/app');
       }
     } catch (err: any) {
       toast.error(err.message || 'Authentication failed');
@@ -120,7 +120,7 @@ export default function Auth() {
           </form>
 
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/app')}
             className="w-full mt-3 px-4 py-2 font-mono-data text-[0.7rem] uppercase tracking-wider transition-colors"
             style={{ color: 'hsl(var(--ct-muted))', minHeight: '44px' }}
           >

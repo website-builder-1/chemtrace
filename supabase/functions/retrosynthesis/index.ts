@@ -315,6 +315,20 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Per-visitor limit on fresh (uncached) engine runs: max 5 per 2 minutes.
+    const ip = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
+    const since = new Date(Date.now() - 120_000).toISOString();
+    const { count } = await admin.from("rate_limits").select("id", { count: "exact", head: true })
+      .eq("client_key", ip).gte("created_at", since);
+    if ((count ?? 0) >= 5) {
+      return new Response(JSON.stringify({ valid: false, error: "You're running searches quickly — please wait a moment and try again." }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    await admin.from("rate_limits").insert({ client_key: ip });
+    // Opportunistic cleanup of old entries
+    admin.from("rate_limits").delete().lt("created_at", new Date(Date.now() - 3_600_000).toISOString()).then(() => {});
+
     const engineOutput = await runRetrosynthesisEngine(v.canonical);
     const shaped = shapeRoutes(engineOutput, v.canonical);
 

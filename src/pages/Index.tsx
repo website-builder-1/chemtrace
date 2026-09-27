@@ -197,6 +197,7 @@ export default function Index() {
   }, []);
 
   const runPipeline = async (opts?: { bypassScreening?: boolean }) => {
+    if (isLoading) return; // one search at a time
     const raw = query.trim() || 'ibuprofen';
     setIsLoading(true);
     setError('');
