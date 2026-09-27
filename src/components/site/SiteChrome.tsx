@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, FlaskConical } from 'lucide-react';
 import { useRoles } from '@/hooks/useRoles';
+import { supabase } from '@/integrations/supabase/client';
 
 const links = [
   { to: '/', label: 'Home' },
@@ -12,12 +13,14 @@ const links = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const { isAdmin, isModerator } = useRoles();
+  const { isAdmin, isModerator, hasAccess, userId } = useRoles();
   const staff = [
-    ...(isAdmin ? [{ to: '/admin', label: 'Admin' }] : []),
     ...(isAdmin || isModerator ? [{ to: '/moderator', label: 'Moderator' }] : []),
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin' }] : []),
   ];
-  const all = [...links, ...staff];
+  const all = [...links.filter(l => l.to !== '/research' || hasAccess), ...staff];
+  const cta = userId ? { to: '/app', label: 'Open tool →' } : { to: '/auth', label: 'Sign in →' };
+  const signOut = async () => { await supabase.auth.signOut(); window.location.href = '/'; };
   return (
     <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-teal))' }}>
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
@@ -28,7 +31,8 @@ export function SiteHeader() {
           {all.map(l => (
             <NavLink key={l.to} to={l.to} className="hover:opacity-80" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</NavLink>
           ))}
-          <Link to="/app" className="px-4 py-2 rounded-[3px]" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>Try it →</Link>
+          {userId && <button onClick={signOut} className="hover:opacity-80 uppercase" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>Sign out</button>}
+          <Link to={cta.to} className="px-4 py-2 rounded-[3px]" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>{cta.label}</Link>
         </nav>
         <button className="md:hidden" aria-label="Menu" onClick={() => setOpen(o => !o)} style={{ color: 'hsl(var(--ct-paper))' }}>
           {open ? <X /> : <Menu />}
@@ -39,7 +43,8 @@ export function SiteHeader() {
           {all.map(l => (
             <Link key={l.to} to={l.to} onClick={() => setOpen(false)} style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</Link>
           ))}
-          <Link to="/app" onClick={() => setOpen(false)} className="px-4 py-2 rounded-[3px] text-center" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>Try it →</Link>
+          {userId && <button onClick={signOut} className="text-left uppercase" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>Sign out</button>}
+          <Link to={cta.to} onClick={() => setOpen(false)} className="px-4 py-2 rounded-[3px] text-center" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>{cta.label}</Link>
         </nav>
       )}
     </header>
@@ -62,7 +67,7 @@ export function SiteFooter() {
           <Link to="/app">Launch the tool</Link>
           <Link to="/research">Ask a chemistry question</Link>
           <Link to="/team">Meet the team</Link>
-          <Link to="/auth">Sign in / Sign up</Link>
+          <Link to="/auth">Client sign in</Link>
         </div>
       </div>
       <div className="text-center font-mono-data text-[0.65rem] pb-6" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>© {new Date().getFullYear()} Chemtraceit</div>
