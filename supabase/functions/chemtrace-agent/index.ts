@@ -7,7 +7,7 @@ const corsHeaders = {
 
 // Groq first (fast), Hugging Face as backup. Both speak the same streaming format.
 const PROVIDERS = [
-  { url: "https://api.groq.com/openai/v1/chat/completions", key: "GROQ_API_KEY", model: "llama-3.3-70b-versatile" },
+  { url: "https://api.groq.com/openai/v1/chat/completions", key: "GROQ_API_KEY", model: "openai/gpt-oss-120b" },
   { url: "https://router.huggingface.co/v1/chat/completions", key: "HUGGINGFACE_API_TOKEN", model: "meta-llama/Llama-3.3-70B-Instruct:fastest" },
 ];
 
