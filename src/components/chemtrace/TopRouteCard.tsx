@@ -6,7 +6,7 @@ import { fmt, type Currency } from '@/lib/currency';
 import { computeGreenMetrics, ratingColor } from '@/lib/greenChem';
 import { searchLiterature, buildQuery, type Citation } from '@/lib/literature';
 import SectionLabel from './SectionLabel';
-import { materialsForStep } from '@/lib/stepMaterials';
+import { materialsForStep, useSupplierCatalog } from '@/lib/stepMaterials';
 
 const statusStyle = (s: string) => {
   if (s === 'APPROVED') return { color: 'hsl(var(--ct-status-green))', icon: '✓' };
@@ -83,6 +83,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
   const green = computeGreenMetrics(molecule, route);
   const [citations, setCitations] = useState<Citation[]>([]);
   const [citLoading, setCitLoading] = useState(true);
+  const catalog = useSupplierCatalog();
 
   useEffect(() => {
     let cancelled = false;
@@ -184,21 +185,38 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                   <Sparkles className="w-2.5 h-2.5" /> Explain
                 </button>
                 <ConditionsBlock c={step.conditions} />
-                {materialsForStep(step.conditions).length > 0 && (
+                {materialsForStep(step.conditions, catalog).length > 0 && (
                   <div className="mt-2 rounded-[2px] p-2" style={{ backgroundColor: 'hsl(var(--ct-paper2))' }}>
                     <div className="font-mono-data uppercase text-[0.55rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-muted))' }}>Where to buy</div>
-                    <ul className="space-y-1">
-                      {materialsForStep(step.conditions).map(m => (
-                        <li key={m.name} className="flex flex-wrap items-center gap-x-2 text-xs font-body" style={{ color: 'hsl(var(--ct-ink))' }}>
+                    <ul className="space-y-2">
+                      {materialsForStep(step.conditions, catalog).map(m => (
+                        <li key={m.name} className="text-xs font-body" style={{ color: 'hsl(var(--ct-ink))' }}>
                           <span className="font-medium">{m.name}</span>
-                          <span className="font-mono-data text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>{m.role}{m.cas && ` · CAS ${m.cas}`}</span>
-                          <span className="font-mono-data text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }}>{m.price}</span>
-                          <a href={m.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 underline text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }}>
-                            {m.supplier} <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
+                          <span className="ml-2 font-mono-data text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>{m.role}</span>
+                          {m.offers.length === 0 ? (
+                            <a href={m.fallbackUrl} target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-0.5 underline text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }}>
+                              Search suppliers <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          ) : (
+                            <ul className="mt-0.5 ml-3 space-y-0.5">
+                              {m.offers.map(o => (
+                                <li key={o.supplier + o.product_name} className="flex flex-wrap items-center gap-x-2">
+                                  <a href={o.product_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 underline text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }}>
+                                    {o.supplier} <ExternalLink className="w-2.5 h-2.5" />
+                                  </a>
+                                  <span className="text-[0.65rem]">{o.product_name}</span>
+                                  <span className="font-mono-data text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>{o.cas && `CAS ${o.cas} · `}{o.pack_size}</span>
+                                  <span className="font-mono-data text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }} title={o.price_note}>
+                                    {o.price != null ? `${o.currency} ${o.price}` : 'Quote on request'}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </li>
                       ))}
                     </ul>
+                    <p className="mt-1 font-body italic text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>Indicative list prices — confirm on the supplier's site before ordering.</p>
                   </div>
                 )}
               </div>

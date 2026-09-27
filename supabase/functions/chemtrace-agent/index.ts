@@ -5,62 +5,46 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const HF_MODEL = "meta-llama/Llama-3.3-70B-Instruct:fastest";
+// Groq first (fast), Hugging Face as backup. Both speak the same streaming format.
+const PROVIDERS = [
+  { url: "https://api.groq.com/openai/v1/chat/completions", key: "GROQ_API_KEY", model: "llama-3.3-70b-versatile" },
+  { url: "https://router.huggingface.co/v1/chat/completions", key: "HUGGINGFACE_API_TOKEN", model: "meta-llama/Llama-3.3-70B-Instruct:fastest" },
+];
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const { messages, context, type } = await req.json();
-    const HF_TOKEN = Deno.env.get("HUGGINGFACE_API_TOKEN");
-    if (!HF_TOKEN) throw new Error("HUGGINGFACE_API_TOKEN is not configured");
 
     const systemPrompt = type === 'protocol'
       ? `You are an expert synthetic chemist writing detailed laboratory synthesis protocols. You provide precise quantities, temperatures, reaction times, safety precautions, and QC checkpoints. Use scientific notation and proper chemical nomenclature. Context: ${context}`
-      : `You are Chemtraceit AI, an expert chemistry assistant specializing in organic synthesis, pharmaceutical manufacturing, reagent procurement, and regulatory compliance. You provide detailed, scientifically accurate answers about synthesis routes, reaction mechanisms, safety considerations, and supply chain logistics. Be concise but thorough. Use chemical nomenclature correctly. Context about the current analysis: ${context}`;
+      : `You are ChemTraceIt's Chemistry AI, an expert chemistry assistant specializing in organic synthesis, pharmaceutical manufacturing, reagent procurement, and regulatory compliance. Never mention which underlying model or provider you run on. You provide detailed, scientifically accurate answers about synthesis routes, reaction mechanisms, safety considerations, and supply chain logistics. Be concise but thorough. Use chemical nomenclature correctly. Context about the current analysis: ${context}`;
 
-    const hfUrl = "https://router.huggingface.co/v1/chat/completions";
-    console.log("Calling HF URL:", hfUrl, "Model:", HF_MODEL);
-
-    const response = await fetch(hfUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${HF_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: HF_MODEL,
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
-        stream: true,
-        max_tokens: 2048,
-      }),
-    });
-
-    if (!response.ok) {
-      const t = await response.text();
-      console.error("HF error:", response.status, response.statusText, "body:", t);
-      console.error("HF response headers:", JSON.stringify(Object.fromEntries(response.headers.entries())));
-      
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Hugging Face rate limit reached. Free tier allows ~5 requests/min. Please wait and try again." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 503) {
-        return new Response(JSON.stringify({ error: "Model is loading on Hugging Face (cold start). Please try again in 20-30 seconds." }), {
-          status: 503,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      return new Response(JSON.stringify({ error: `Hugging Face error (${response.status}): ${t}` }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    let lastStatus = 500;
+    for (const p of PROVIDERS) {
+      const token = Deno.env.get(p.key);
+      if (!token) continue;
+      const response = await fetch(p.url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: p.model,
+          messages: [{ role: "system", content: systemPrompt }, ...messages],
+          stream: true,
+          max_tokens: 2048,
+        }),
       });
+      if (response.ok) {
+        return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
+      }
+      lastStatus = response.status;
+      console.error("provider failed", p.url, response.status, (await response.text()).slice(0, 300));
     }
+    return new Response(JSON.stringify({ error: lastStatus === 429 ? "The assistant is busy right now — please try again in a minute." : "The assistant is temporarily unavailable — please try again shortly." }), {
+      status: lastStatus === 429 ? 429 : 503,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
 
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
