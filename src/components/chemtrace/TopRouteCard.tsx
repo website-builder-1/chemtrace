@@ -6,7 +6,7 @@ import { fmt, type Currency } from '@/lib/currency';
 import { computeGreenMetrics, ratingColor } from '@/lib/greenChem';
 import { searchLiterature, buildQuery, type Citation } from '@/lib/literature';
 import SectionLabel from './SectionLabel';
-import { materialsForStep, useSupplierCatalog } from '@/lib/stepMaterials';
+import { materialsForStep, useSupplierCatalog, priceLabel } from '@/lib/stepMaterials';
 
 const statusStyle = (s: string) => {
   if (s === 'APPROVED') return { color: 'hsl(var(--ct-status-green))', icon: '✓' };
@@ -185,11 +185,11 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                   <Sparkles className="w-2.5 h-2.5" /> Explain
                 </button>
                 <ConditionsBlock c={step.conditions} />
-                {materialsForStep(step.conditions, catalog).length > 0 && (
+                {materialsForStep(step.conditions, catalog, step, route.steps).length > 0 && (
                   <div className="mt-2 rounded-[2px] p-2" style={{ backgroundColor: 'hsl(var(--ct-paper2))' }}>
                     <div className="font-mono-data uppercase text-[0.55rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-muted))' }}>Where to buy</div>
                     <ul className="space-y-2">
-                      {materialsForStep(step.conditions, catalog).map(m => (
+                      {materialsForStep(step.conditions, catalog, step, route.steps).map(m => (
                         <li key={m.name} className="text-xs font-body" style={{ color: 'hsl(var(--ct-ink))' }}>
                           <span className="font-medium">{m.name}</span>
                           <span className="ml-2 font-mono-data text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>{m.role}</span>
@@ -209,6 +209,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                                   <span className="font-mono-data text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }} title={o.price_note}>
                                     {o.price != null ? `${o.currency} ${o.price}` : 'Quote on request'}
                                   </span>
+                                  <span className="font-mono-data text-[0.55rem]" style={{ color: 'hsl(var(--ct-muted))' }}>{priceLabel(o)}</span>
                                 </li>
                               ))}
                             </ul>
@@ -216,7 +217,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-1 font-body italic text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>Indicative list prices — confirm on the supplier's site before ordering.</p>
+                    <p className="mt-1 font-body italic text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>Prices update live when changed — confirm on the supplier's site before ordering.</p>
                   </div>
                 )}
               </div>

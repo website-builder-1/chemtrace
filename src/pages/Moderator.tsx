@@ -107,25 +107,37 @@ function FactsTab({ userId }: { userId: string }) {
   );
 }
 
-interface Sp { id: string; supplier_id: string; material_key: string; product_name: string; pack_size: string; price: number | null; currency: string; product_url: string }
+interface Sp { id: string; supplier_id: string; material_key: string; product_name: string; pack_size: string; price: number | null; currency: string; product_url: string; price_source: string; auto_status: string | null; updated_at: string; manual_override: boolean }
 
 function SuppliersTab() {
   const [rows, setRows] = useState<Sp[]>([]);
   const [q, setQ] = useState('');
-  const load = () => supabase.from('supplier_products').select('id, supplier_id, material_key, product_name, pack_size, price, currency, product_url').order('material_key').then(({ data }) => setRows(data ?? []));
+  const [checking, setChecking] = useState(false);
+  const load = () => supabase.from('supplier_products').select('id, supplier_id, material_key, product_name, pack_size, price, currency, product_url, price_source, auto_status, updated_at, manual_override').order('material_key').then(({ data }) => setRows(data ?? []));
   useEffect(() => { load(); }, []);
   const save = async (r: Sp) => {
-    const { error } = await supabase.from('supplier_products').update({ product_name: r.product_name, pack_size: r.pack_size, price: r.price, currency: r.currency, product_url: r.product_url, updated_at: new Date().toISOString() }).eq('id', r.id);
-    if (error) toast.error(error.message); else toast.success('Saved.');
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = await supabase.from('supplier_products').update({ product_name: r.product_name, pack_size: r.pack_size, price: r.price, currency: r.currency, product_url: r.product_url, price_source: 'manual', manual_override: true, updated_by: u.user?.id ?? null, price_note: 'Checked by ChemTraceIt staff', updated_at: new Date().toISOString() }).eq('id', r.id);
+    if (error) toast.error(error.message); else { toast.success('Saved — clients see the new price now.'); load(); }
+  };
+  const checkNow = async () => {
+    setChecking(true);
+    const { data, error } = await supabase.functions.invoke('supplier-prices', { body: {} });
+    setChecking(false);
+    if (error) toast.error('Price check failed'); else { toast.success(`Checked ${data.checked}: ${data.found} prices found, ${data.updated} updated, ${data.blocked} sites blocked the check.`); load(); }
   };
   const shown = rows.filter(r => !q || `${r.material_key} ${r.product_name} ${r.supplier_id}`.toLowerCase().includes(q.toLowerCase()));
   const upd = (id: string, patch: Partial<Sp>) => setRows(rs => rs.map(r => r.id === id ? { ...r, ...patch } : r));
   return (
     <Card>
-      <input className={inputCls} style={inputStyle} placeholder="Search material or supplier" value={q} onChange={e => setQ(e.target.value)} />
+      <div className="flex gap-2 items-center">
+        <input className={inputCls} style={inputStyle} placeholder="Search material or supplier" value={q} onChange={e => setQ(e.target.value)} />
+        <Btn onClick={checkNow} disabled={checking}>{checking ? 'Checking…' : 'Check prices now'}</Btn>
+      </div>
+      <p className="font-body text-xs mt-2" style={muted}>Prices are checked automatically every day. A price you save here is marked "Checked by staff" and the daily check will not overwrite it.</p>
       <div className="overflow-x-auto mt-3">
         <table className="w-full text-xs font-body">
-          <thead><tr className="font-mono-data text-[0.6rem] uppercase text-left" style={muted}><th className="p-2">Material</th><th className="p-2">Supplier</th><th className="p-2">Product</th><th className="p-2">Pack</th><th className="p-2">Price</th><th className="p-2">Cur.</th><th className="p-2">Link</th><th /></tr></thead>
+          <thead><tr className="font-mono-data text-[0.6rem] uppercase text-left" style={muted}><th className="p-2">Material</th><th className="p-2">Supplier</th><th className="p-2">Product</th><th className="p-2">Pack</th><th className="p-2">Price</th><th className="p-2">Cur.</th><th className="p-2">Link</th><th className="p-2">Status</th><th /></tr></thead>
           <tbody>{shown.map(r => (
             <tr key={r.id} className="border-t" style={{ borderColor: 'hsl(var(--ct-border))' }}>
               <td className="p-2 font-mono-data">{r.material_key}</td>
@@ -135,6 +147,7 @@ function SuppliersTab() {
               <td className="p-1 w-24"><input className={inputCls} style={inputStyle} type="number" step="0.01" value={r.price ?? ''} onChange={e => upd(r.id, { price: e.target.value === '' ? null : Number(e.target.value) })} /></td>
               <td className="p-1 w-20"><select className={inputCls} style={inputStyle} value={r.currency} onChange={e => upd(r.id, { currency: e.target.value })}><option>USD</option><option>GBP</option><option>EUR</option></select></td>
               <td className="p-1"><input className={inputCls} style={inputStyle} value={r.product_url} onChange={e => upd(r.id, { product_url: e.target.value })} /></td>
+              <td className="p-2 font-mono-data text-[0.6rem]" style={muted}>{r.price_source === 'manual' ? 'Staff' : r.price_source === 'auto' ? 'Live' : 'Estimate'} · {new Date(r.updated_at).toLocaleDateString()}{r.auto_status ? <div>Auto: {r.auto_status}</div> : null}</td>
               <td className="p-1"><Btn onClick={() => save(r)}>Save</Btn></td>
             </tr>))}</tbody>
         </table>

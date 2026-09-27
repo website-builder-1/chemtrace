@@ -710,51 +710,113 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_price_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          currency: string | null
+          id: string
+          new_price: number | null
+          old_price: number | null
+          product_id: string
+          source: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          currency?: string | null
+          id?: string
+          new_price?: number | null
+          old_price?: number | null
+          product_id: string
+          source: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          currency?: string | null
+          id?: string
+          new_price?: number | null
+          old_price?: number | null
+          product_id?: string
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supplier_products: {
         Row: {
           aliases: string[]
+          auto_price: number | null
+          auto_status: string | null
           cas: string | null
           currency: string
           grade: string | null
           id: string
+          manual_override: boolean
           material_key: string
           pack_size: string
           price: number | null
+          price_checked_at: string | null
           price_note: string
+          price_source: string
           product_name: string
           product_url: string
+          smiles: string | null
           supplier_id: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           aliases?: string[]
+          auto_price?: number | null
+          auto_status?: string | null
           cas?: string | null
           currency?: string
           grade?: string | null
           id?: string
+          manual_override?: boolean
           material_key: string
           pack_size: string
           price?: number | null
+          price_checked_at?: string | null
           price_note?: string
+          price_source?: string
           product_name: string
           product_url: string
+          smiles?: string | null
           supplier_id: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           aliases?: string[]
+          auto_price?: number | null
+          auto_status?: string | null
           cas?: string | null
           currency?: string
           grade?: string | null
           id?: string
+          manual_override?: boolean
           material_key?: string
           pack_size?: string
           price?: number | null
+          price_checked_at?: string | null
           price_note?: string
+          price_source?: string
           product_name?: string
           product_url?: string
+          smiles?: string | null
           supplier_id?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
