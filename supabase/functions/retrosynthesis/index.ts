@@ -154,7 +154,7 @@ async function runRetrosynthesisEngine(
     `Prefer commercially available starting materials. Every reaction must be ` +
     `chemically correct and atom-plausible (e.g. hydrolysis of ethylene oxide gives ethylene glycol, NOT ethanol). ` +
     `For simple industrial chemicals, include the real industrial process. `+
-    `Reaction SMILES MUST be ` +
+    `Reaction SMILES MUST be atom-balanced: list EVERY reactant (including water, H2, oxidants) on the left and the product plus by-products (H2O, HCl, CO2...) on the right. Reaction SMILES MUST be ` +
     `"reactants>>product". Do not invent CAS numbers. Output JSON only, ` +
     `matching this TypeScript shape: { routes: Array<{ name: string; score: number; ` +
     `yieldPercent?: number; complexity?: number; decisionReason?: string; ` +
