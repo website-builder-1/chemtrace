@@ -316,12 +316,38 @@ function decomposable(left: Counts, byproducts: Counts[], depth = 0): boolean {
   return false;
 }
 
+// Free models often write condensed formulas ("C6H5CHO+H2") instead of
+// SMILES. Repair the common patterns so the check can still run.
+const FRAGMENT_FIX: Record<string, string> = {
+  H2O: "O", H2: "[H][H]", HCl: "Cl", HBr: "Br", HI: "I", HF: "F", NH3: "N", CO2: "O=C=O",
+  CO: "[C-]#[O+]", O2: "O=O", N2: "N#N", H2SO4: "OS(=O)(=O)O", NaOH: "[Na+].[OH-]",
+  KOH: "[K+].[OH-]", NaCl: "[Na+].[Cl-]", AlCl3: "Cl[Al](Cl)Cl", C6H6: "c1ccccc1",
+};
+async function repairSmiles(side: string): Promise<string> {
+  const RDKit = await getRDKit();
+  const frags = side.replace(/\s*\+\s*/g, ".").split(".").filter(Boolean);
+  const out: string[] = [];
+  for (let f of frags) {
+    f = f.trim().replace(/^\d+(?=[A-Z])/, ""); // strip stoichiometric coefficients
+    const test = RDKit.get_mol(f);
+    const valid = test && test.is_valid();
+    try { test?.delete(); } catch { /* */ }
+    if (valid && !/^[A-Z][a-z]?\d/.test(f)) { out.push(f); continue; }
+    if (FRAGMENT_FIX[f]) { out.push(FRAGMENT_FIX[f]); continue; }
+    const fixed = f.replace(/C6H5/g, "c1ccccc1").replace(/COOH/g, "C(=O)O").replace(/COO/g, "C(=O)O")
+      .replace(/CHO/g, "C=O").replace(/CH3|CH2|CH(?![a-z])/g, "C").replace(/NH2/g, "N").replace(/OH/g, "O");
+    out.push(fixed);
+  }
+  return out.join(".");
+}
+
 // deno-lint-ignore no-explicit-any
 async function checkStep(step: any): Promise<"balanced" | "unchecked" | string> {
   const rxn: string | undefined = step.reactionSmiles;
   if (!rxn || !rxn.includes(">")) return "unchecked";
   const parts = rxn.split(">");
-  const lhs = parts[0], rhs = parts[parts.length - 1];
+  const lhs = await repairSmiles(parts[0]), rhs = await repairSmiles(parts[parts.length - 1]);
+  step.reactionSmiles = `${lhs}>>${rhs}`;
   const r = await atomCounts(lhs);
   const p = await atomCounts(rhs.split(".").sort((a, b) => b.length - a.length)[0] ?? "");
   if (!r || !p) return "reaction SMILES could not be parsed";
