@@ -43,6 +43,13 @@
       "when": 1790539788551,
       "tag": "0005_add_client_role",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790539807893,
+      "tag": "0006_onboarding_terms",
+      "breakpoints": true
     }
   ]
 }
