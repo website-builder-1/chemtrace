@@ -653,6 +653,86 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_products: {
+        Row: {
+          aliases: string[]
+          cas: string | null
+          currency: string
+          grade: string | null
+          id: string
+          material_key: string
+          pack_size: string
+          price: number | null
+          price_note: string
+          product_name: string
+          product_url: string
+          supplier_id: string
+          updated_at: string
+        }
+        Insert: {
+          aliases?: string[]
+          cas?: string | null
+          currency?: string
+          grade?: string | null
+          id?: string
+          material_key: string
+          pack_size: string
+          price?: number | null
+          price_note?: string
+          product_name: string
+          product_url: string
+          supplier_id: string
+          updated_at?: string
+        }
+        Update: {
+          aliases?: string[]
+          cas?: string | null
+          currency?: string
+          grade?: string | null
+          id?: string
+          material_key?: string
+          pack_size?: string
+          price?: number | null
+          price_note?: string
+          product_name?: string
+          product_url?: string
+          supplier_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          country: string
+          id: string
+          kind: string
+          name: string
+          website: string
+        }
+        Insert: {
+          country: string
+          id: string
+          kind?: string
+          name: string
+          website: string
+        }
+        Update: {
+          country?: string
+          id?: string
+          kind?: string
+          name?: string
+          website?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
