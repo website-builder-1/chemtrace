@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     const evidence: Array<Evidence & { id: string; kind: string }> = [];
     const compounds = [];
     for (const e of entities.slice(0, 3)) {
-      const isSmiles = !!(await canonical(e)) && /[=#()\[\]]|^[A-Za-z0-9@+\-\[\]\(\)=#\\\/\.]+$/.test(e) && !/\s/.test(e) && /[a-z]?[A-Z]/.test(e) && e.length > 1 && !/^[A-Z][a-z]+$/.test(e);
+      const isSmiles = !/\s/.test(e) && !!(await canonical(e));
       const c = await resolveCompound(admin, isSmiles ? { smiles: e } : { name: e }).catch(() => null);
       if (!c) continue;
       compounds.push(c);
