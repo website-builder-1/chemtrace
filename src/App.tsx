@@ -9,6 +9,8 @@ import Landing from "./pages/Landing.tsx";
 import Team from "./pages/Team.tsx";
 import Research from "./pages/Research.tsx";
 import Benchmark from "./pages/Benchmark.tsx";
+import Admin from "./pages/Admin.tsx";
+import Moderator from "./pages/Moderator.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,9 @@ const App = () => (
           <Route path="/team" element={<Team />} />
           <Route path="/research" element={<Research />} />
           <Route path="/benchmark" element={<Benchmark />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/benchmark" element={<Benchmark />} />
+          <Route path="/moderator" element={<Moderator />} />
           <Route path="/auth" element={<Auth />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
