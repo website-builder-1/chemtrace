@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      rate_limits: {
+        Row: {
+          client_key: string
+          created_at: string
+          id: number
+        }
+        Insert: {
+          client_key: string
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          client_key?: string
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       retrosynthesis_cache: {
         Row: {
           canonical_smiles: string
