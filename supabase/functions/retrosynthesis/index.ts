@@ -26,7 +26,7 @@ const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 const HF_MODELS = [
   "meta-llama/Llama-3.3-70B-Instruct:fastest",
   "Qwen/Qwen2.5-72B-Instruct:fastest",
-  "Qwen/Qwen2.5-7B-Instruct:fastest",
+  "meta-llama/Llama-3.1-8B-Instruct:fastest",
 ];
 
 // ── RDKit (lazy singleton, reused across invocations) ────────────────────
@@ -170,7 +170,11 @@ async function runRetrosynthesisEngine(
   // unavailable provider never blocks the whole request.
   const deadline = Date.now() + 110_000;
   let lastErr: unknown = null;
-  for (const model of HF_MODELS) {
+  const attempts: Array<{ model: string; feedback?: boolean }> = [];
+  for (const m of HF_MODELS) attempts.push({ model: m }, { model: m, feedback: true });
+  let feedbackMsg = "";
+  for (const { model, feedback } of attempts) {
+    if (feedback && !feedbackMsg) continue;
     const remaining = deadline - Date.now();
     if (remaining < 5_000) break;
     const controller = new AbortController();
@@ -187,7 +191,7 @@ async function runRetrosynthesisEngine(
           model,
           messages: [
             { role: "system", content: system },
-            { role: "user", content: user },
+            { role: "user", content: feedback ? user + feedbackMsg : user },
           ],
           temperature: 0.2,
           max_tokens: 3000,
@@ -204,6 +208,13 @@ async function runRetrosynthesisEngine(
       const parsed = typeof raw === "string" ? extractJson(raw) : raw;
       if (parsed && Array.isArray(parsed.routes) && parsed.routes.length) {
         const good = await filterBalancedRoutes(parsed.routes, canonicalSmiles);
+        feedbackMsg = "";
+        if (!good.length) {
+          feedbackMsg = `\n\nYour previous answer was rejected by an automatic atom-balance check:\n- ${lastRejections.slice(0, 6).join("\n- ")}\n` +
+            `Use valid SMILES only (no formulas like C6H6, no '+' signs; separate molecules with '.'). ` +
+            `Every route must end in the target ${canonicalSmiles}, and each reaction must be chemically correct and atom-balanced.`;
+        }
+        lastRejections = [];
         if (good.length) {
           usedModel = model;
           return { routes: good };
@@ -347,6 +358,7 @@ async function filterBalancedRoutes(routes: any[], canonical: string): Promise<a
       s.atomCheck = res === "balanced" || res === "unchecked" ? res : "failed";
       if (s.atomCheck === "failed") {
         console.warn(`rejected route "${route.name}": ${res} [${s.reactionSmiles}]`);
+        lastRejections.push(`"${route.name}" step "${s.reactionSmiles}": ${res}`);
         pass = false; break;
       }
     }
@@ -358,6 +370,7 @@ async function filterBalancedRoutes(routes: any[], canonical: string): Promise<a
       const frags = await Promise.all(String(finalSmi).split(".").map(canon));
       if (!frags.includes(canonical)) {
         console.warn(`rejected route "${route.name}": final product ${finalSmi} is not the target`);
+        lastRejections.push(`"${route.name}": final product ${finalSmi} is not the target ${canonical}`);
         continue;
       }
     }
@@ -365,6 +378,8 @@ async function filterBalancedRoutes(routes: any[], canonical: string): Promise<a
   }
   return ok;
 }
+
+let lastRejections: string[] = [];
 
 // ── Response shaping ─────────────────────────────────────────────────────
 
