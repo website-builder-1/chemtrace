@@ -6,3 +6,4 @@
 - Chemical properties come only from PubChem/RDKit (`_shared/compounds.ts`, `_shared/chem.ts`); the LLM never computes them.
 - Retrosynthesis order: verified_routes → reactions DB → RDKit templates (`retrosynthesis/templates.ts`) → AI gap-fill; every route carries `evidence` (documented/analogous/hypothesis).
 - Orchestrator answers only from retrieved evidence with [id] citations; claims without valid citations are downgraded — keeps LLM from being the source of truth.
+- Staff accounts are managed only via the `admin-users` edge function (service role + has_role admin check); main admin aryan@chemtraceit.com is protected from changes — prevents privilege escalation from the browser.
