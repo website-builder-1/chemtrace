@@ -24,8 +24,8 @@ const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 // Ordered fallback chain (all Hugging Face). ":fastest" lets the HF router
 // pick the quickest live provider for that model.
 const HF_MODELS = [
-  "Qwen/Qwen2.5-72B-Instruct:fastest",
   "meta-llama/Llama-3.3-70B-Instruct:fastest",
+  "Qwen/Qwen2.5-72B-Instruct:fastest",
   "Qwen/Qwen2.5-7B-Instruct:fastest",
 ];
 
@@ -151,7 +151,10 @@ async function runRetrosynthesisEngine(
     `conditions (solvent, catalyst, reagents, temperature, pressure, time) ` +
     `with a confidence score grounded in literature precedent. Cite a model ` +
     `name or DOI in 'source' and an integer 'precedents' count when you can. ` +
-    `Prefer commercially available starting materials. Reaction SMILES MUST be ` +
+    `Prefer commercially available starting materials. Every reaction must be ` +
+    `chemically correct and atom-plausible (e.g. hydrolysis of ethylene oxide gives ethylene glycol, NOT ethanol). ` +
+    `For simple industrial chemicals, include the real industrial process. `+
+    `Reaction SMILES MUST be ` +
     `"reactants>>product". Do not invent CAS numbers. Output JSON only, ` +
     `matching this TypeScript shape: { routes: Array<{ name: string; score: number; ` +
     `yieldPercent?: number; complexity?: number; decisionReason?: string; ` +
@@ -171,7 +174,7 @@ async function runRetrosynthesisEngine(
     const remaining = deadline - Date.now();
     if (remaining < 5_000) break;
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), Math.min(45_000, remaining));
+    const timeout = setTimeout(() => controller.abort(), Math.min(40_000, remaining));
     try {
       const res = await fetch(HF_URL, {
         method: "POST",
