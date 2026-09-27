@@ -290,6 +290,25 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const admin = createClient(supabaseUrl, supabaseKey);
 
+    // Verified literature routes take priority over any AI output.
+    const { data: verified } = await admin
+      .from("verified_routes")
+      .select("routes, common_name, references_text")
+      .eq("canonical_smiles", v.canonical)
+      .maybeSingle();
+    if (verified?.routes) {
+      return new Response(JSON.stringify({
+        valid: true,
+        canonical_smiles: v.canonical,
+        descriptors: { formula: v.formula, mw: v.mw, rings: v.rings },
+        engine: "verified-literature",
+        verified: true,
+        references: verified.references_text,
+        cached: true,
+        routes: verified.routes,
+      }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // Cache lookup
     if (!force) {
       const { data: cached } = await admin
