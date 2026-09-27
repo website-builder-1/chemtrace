@@ -47,9 +47,12 @@ function PasswordStep({ onDone }: { onDone: () => void }) {
     const v = pwSchema.safeParse({ password, confirm });
     if (!v.success) return toast.error(v.error.issues[0].message);
     setBusy(true);
+    const email = (await supabase.auth.getUser()).data.user?.email ?? '';
     const { data, error } = await supabase.functions.invoke('admin-users', { body: { action: 'change_own_password', password } });
+    if (error || data?.error) { setBusy(false); return toast.error(data?.error ?? 'Could not save your password.'); }
+    // Changing the password ends old sessions — sign back in with the new one.
+    await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error || data?.error) return toast.error(data?.error ?? 'Could not save your password.');
     toast.success('Password saved.');
     onDone();
   };
