@@ -45,10 +45,6 @@ serve(async (req) => {
       status: lastStatus === 429 ? 429 : 503,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
   } catch (e) {
     console.error("chemtrace-agent error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
