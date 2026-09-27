@@ -11,11 +11,6 @@ import { Btn, Card, Tabs, inputCls, inputStyle, muted, ink } from '@/components/
 interface Title { id: string; name: string }
 type Tab = 'staff' | 'titles' | 'benchmark' | 'log';
 
-async function call(body: Record<string, unknown>) {
-  const { data, error } = await supabase.functions.invoke('admin-users', { body });
-  if (error || data?.error) { toast.error(data?.error ?? 'Something went wrong.'); return null; }
-  return data;
-}
 
 export default function Admin() {
   const { loading, isAdmin } = useRoles();
