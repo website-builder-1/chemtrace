@@ -1,3 +1,4 @@
+import { EvidenceBadge, toEvidenceLevel } from './EvidenceBadge';
 import { useEffect, useState } from 'react';
 import { ExternalLink, Sparkles, Leaf, FlaskConical, Bot } from 'lucide-react';
 import type { SynthesisRoute, MoleculeData, ReactionConditions } from '@/types/chemtrace';
@@ -111,6 +112,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
           <span className="font-mono-data uppercase text-[0.6rem] tracking-wider text-white px-2 py-0.5 rounded-[1px]" style={{ backgroundColor: 'hsl(var(--ct-teal))' }}>★ Recommended</span>
           <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-ink))' }}>{route.name}</span>
           <span className="font-mono-data uppercase text-[0.6rem] tracking-wider" style={{ color: st.color }}>{st.icon} {route.status}</span>
+          <EvidenceBadge level={toEvidenceLevel(route.evidence)} />
           {route.aiGenerated && (
             <span className="inline-flex items-center gap-1 font-mono-data uppercase text-[0.55rem] tracking-wider px-1.5 py-0.5 rounded-[2px]" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-status-gold))' }} title={`Engine: ${route.engine}`}>
               <Bot className="w-3 h-3" /> AI-GENERATED · {route.engine}

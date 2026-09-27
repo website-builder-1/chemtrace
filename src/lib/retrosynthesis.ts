@@ -19,6 +19,7 @@ export interface RetrosynthesisResponse {
     yieldPercent: number;
     complexity?: number;
     decisionReason: string;
+    evidence?: string;
     startingMaterials: string[];
     steps: RouteStep[];
   }>;
@@ -89,7 +90,9 @@ export function adaptEngineRoutes(
     });
     const reagentList = Array.from(reagents);
     const costPerGram = +(mw * 0.08 + 5 + (r.steps.length * 1.5)).toFixed(2);
-    const verified = engine === 'verified-literature';
+    const evidence = engine === 'verified-literature' ? 'documented' : (r.evidence ?? 'hypothesis');
+    const verified = evidence === 'documented';
+    const analogous = evidence === 'analogous';
     const status = r.score >= 0.8 ? 'APPROVED' : r.score >= 0.5 ? 'FLAGGED' : 'REJECTED';
     return {
       id: `R${idx + 1}`,
@@ -107,14 +110,19 @@ export function adaptEngineRoutes(
       reagentProcurement: reagentList.map(defaultReagent),
       citation: verified
         ? `Verified route from established literature (${r.steps.map(s => s.conditions?.source).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join('; ')}).`
-        : `Computed by ${engine}. Routes are AI-generated proposals — verify against literature before scale-up.`,
+        : analogous
+          ? `Standard reaction template applied by RDKit (${r.steps.map(s => s.conditions?.source).filter(Boolean)[0] ?? 'textbook'}). Conditions are typical, not reported for this exact molecule.`
+          : `Computed by ${engine}. Routes are AI-generated proposals — verify against literature before scale-up.`,
       supplyRisk: 'low' as RiskLevel,
       regulatoryRisk: 'low' as RiskLevel,
       decisionReason: r.decisionReason,
       engine,
-      aiGenerated: !verified,
+      aiGenerated: evidence === 'hypothesis',
+      evidence,
       complexity: r.complexity,
-      riskNotes: verified ? [
+      riskNotes: analogous ? [
+        { type: 'info', text: `Deterministic template disconnection with atom balance checked. Precursors and conditions follow a standard reaction class; confirm with a literature example before scale-up (${location}).` },
+      ] : verified ? [
         { type: 'info', text: `Checked route from textbook/industrial literature — not AI-generated. Conditions are typical published values; adapt to your scale (${location}).` },
       ] : [
         {
