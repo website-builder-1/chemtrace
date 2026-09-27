@@ -203,8 +203,14 @@ async function runRetrosynthesisEngine(
       const raw = data?.choices?.[0]?.message?.content ?? "";
       const parsed = typeof raw === "string" ? extractJson(raw) : raw;
       if (parsed && Array.isArray(parsed.routes) && parsed.routes.length) {
-        usedModel = model;
-        return parsed;
+        const good = await filterBalancedRoutes(parsed.routes, canonicalSmiles);
+        if (good.length) {
+          usedModel = model;
+          return { routes: good };
+        }
+        lastErr = new Error("No chemically consistent route found (every suggested route failed the atom-balance check). Please try again.");
+        console.error(`model ${model}: all routes failed atom check`);
+        continue;
       }
       lastErr = new Error(`Model ${model} returned unparseable output`);
       console.error(String(lastErr));
@@ -313,10 +319,9 @@ async function checkStep(step: any): Promise<"balanced" | "unchecked" | string> 
   const left: Counts = {};
   for (const k of new Set([...Object.keys(r), ...Object.keys(p)])) left[k] = (r[k] ?? 0) - (p[k] ?? 0);
   // Missing reagent atoms that the named chemistry legitimately supplies.
-  if (reductive && (left.H ?? 0) < 0) left.H = (left.H % 2 === 0) ? 0 : -1 - 0 + 0 + (left.H % 2 === 0 ? 0 : 1) - 1 + 1;
   if (reductive && (left.H ?? 0) < 0) left.H = 0;
   if (oxidative && (left.O ?? 0) < 0) left.O = 0;
-  const byproducts = oxidative ? [...BASE_BYPRODUCTS, { H: 2 }, { H: 1 }] : BASE_BYPRODUCTS;
+  const byproducts: Counts[] = oxidative ? [...BASE_BYPRODUCTS, { H: 2 }, { H: 1 }] : [...BASE_BYPRODUCTS];
   if (reductive && (left.H ?? 0) > 0) byproducts.push({ H: 1 });
   const deficit = Object.entries(left).filter(([, v]) => v < 0).map(([k]) => k);
   if (deficit.length) return `product has atoms (${deficit.join(", ")}) not present in reactants`;
@@ -382,6 +387,7 @@ function shapeRoutes(engineOutput: any, canonical: string) {
       reactionSmiles: s.reactionSmiles,
       confidence: typeof s.confidence === "number" ? s.confidence : undefined,
       conditions: s.conditions ?? undefined,
+      atomCheck: s.atomCheck,
     })),
   }));
 }
@@ -446,7 +452,10 @@ Deno.serve(async (req) => {
         .select("payload, engine, created_at")
         .eq("canonical_smiles", v.canonical)
         .maybeSingle();
-      if (cached?.payload) {
+      const cachedOk = Array.isArray(cached?.payload)
+        ? await filterBalancedRoutes(cached!.payload, v.canonical) : [];
+      if (cachedOk.length) {
+        cached!.payload = cachedOk;
         return new Response(
           JSON.stringify({
             valid: true,
