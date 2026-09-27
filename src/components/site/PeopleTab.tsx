@@ -12,8 +12,24 @@ interface Title { id: string; name: string }
 
 export async function callAdmin(body: Record<string, unknown>) {
   const { data, error } = await supabase.functions.invoke('admin-users', { body });
-  if (error || data?.error) { toast.error(data?.error ?? 'Something went wrong.'); return null; }
+  if (data?.error) { toast.error(data.error); return null; }
+  if (error) {
+    // Non-2xx responses: read the real reason from the response body.
+    let msg = 'Something went wrong. Please try again.';
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ctx = (error as any).context as Response | undefined;
+      if (ctx && typeof ctx.json === 'function') { const j = await ctx.clone().json(); if (j?.error) msg = String(j.error); }
+    } catch { /* keep default */ }
+    toast.error(msg); return null;
+  }
   return data;
+}
+
+export function strongPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*?';
+  const a = new Uint32Array(14); crypto.getRandomValues(a);
+  return Array.from(a, n => chars[n % chars.length]).join('');
 }
 
 const roleOf = (p: Person) => p.roles.includes('admin') ? 'admin' : p.roles.includes('moderator') ? 'moderator' : p.roles.includes('client') ? 'client' : 'none';
@@ -74,7 +90,10 @@ export default function PeopleTab({ isAdmin }: { isAdmin: boolean }) {
         <h2 className="font-serif-display text-lg" style={ink}>Create an account</h2>
         <form onSubmit={create} className="grid gap-3 md:grid-cols-2 mt-3">
           <input className={inputCls} style={inputStyle} type="email" required maxLength={255} placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
-          <input className={inputCls} style={inputStyle} type="text" required minLength={8} placeholder="Temporary password (8+ characters)" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+          <div className="flex gap-2">
+            <input className={inputCls} style={inputStyle} type="text" required minLength={10} placeholder="Temporary password (10+ characters, not a common word)" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+            <Btn type="button" variant="ghost" onClick={() => setForm({ ...form, password: strongPassword() })}>Generate</Btn>
+          </div>
           <input className={inputCls} style={inputStyle} maxLength={120} placeholder="Full name" value={form.displayName} onChange={e => setForm({ ...form, displayName: e.target.value })} />
           <input className={inputCls} style={inputStyle} maxLength={120} placeholder="Company (optional)" value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} />
           <select className={inputCls} style={inputStyle} value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} disabled={!isAdmin}>

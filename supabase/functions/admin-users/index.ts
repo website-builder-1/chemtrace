@@ -105,7 +105,8 @@ Deno.serve(async (req) => {
         const email = String(body.email ?? "").trim().toLowerCase();
         const password = String(body.password ?? "");
         const role = String(body.role ?? "client");
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255 || password.length < 8) return json({ error: "A valid email and a password of at least 8 characters are required." }, 400);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) return json({ error: "Please enter a valid email address." }, 400);
+        if (password.length < 10 || password.length > 72) return json({ error: "The temporary password must be 10–72 characters. Use the Generate button for a strong one." }, 400);
         if (!ROLES.includes(role as Role)) return json({ error: "Choose a role." }, 400);
         if (!isAdmin && role !== "client") return json({ error: "Moderators can only create client accounts." }, 403);
         const { data: c, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
