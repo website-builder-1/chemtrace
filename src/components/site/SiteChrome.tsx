@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, FlaskConical } from 'lucide-react';
+import { useRoles } from '@/hooks/useRoles';
 
 const links = [
   { to: '/', label: 'Home' },
@@ -11,6 +12,12 @@ const links = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { isAdmin, isModerator } = useRoles();
+  const staff = [
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin' }] : []),
+    ...(isAdmin || isModerator ? [{ to: '/moderator', label: 'Moderator' }] : []),
+  ];
+  const all = [...links, ...staff];
   return (
     <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-teal))' }}>
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
@@ -18,7 +25,7 @@ export function SiteHeader() {
           <FlaskConical className="w-5 h-5" style={{ color: 'hsl(var(--ct-agent-pulse))' }} /> Chemtraceit
         </Link>
         <nav className="hidden md:flex items-center gap-7 font-mono-data text-xs uppercase tracking-wider">
-          {links.map(l => (
+          {all.map(l => (
             <NavLink key={l.to} to={l.to} className="hover:opacity-80" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</NavLink>
           ))}
           <Link to="/app" className="px-4 py-2 rounded-[3px]" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>Try it →</Link>
@@ -29,7 +36,7 @@ export function SiteHeader() {
       </div>
       {open && (
         <nav className="md:hidden flex flex-col gap-4 px-5 pb-5 font-mono-data text-sm uppercase tracking-wider">
-          {links.map(l => (
+          {all.map(l => (
             <Link key={l.to} to={l.to} onClick={() => setOpen(false)} style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</Link>
           ))}
           <Link to="/app" onClick={() => setOpen(false)} className="px-4 py-2 rounded-[3px] text-center" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>Try it →</Link>

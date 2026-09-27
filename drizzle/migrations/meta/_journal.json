@@ -29,6 +29,13 @@
       "when": 1790537013547,
       "tag": "0003_supplier_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790538220978,
+      "tag": "0004_staff_roles_titles",
+      "breakpoints": true
     }
   ]
 }
