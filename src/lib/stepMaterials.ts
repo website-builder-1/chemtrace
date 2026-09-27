@@ -30,9 +30,9 @@ const norm = (s: string) => s.toLowerCase().replace(/\((cat\.|excess)\)/g, '').r
 
 function match(name: string, cat: CatalogProduct[]): CatalogProduct[] {
   const n = norm(name);
-  const exact = cat.filter(p => norm(p.material_key) === n || p.aliases.some(a => norm(a) === n));
-  if (exact.length) return exact;
-  return cat.filter(p => n.includes(norm(p.material_key)) || p.aliases.some(a => a.length > 2 && n.includes(norm(a))));
+  const words = n.split(/[\s/()]+/).filter(Boolean);
+  return cat.filter(p => [p.material_key, ...p.aliases].map(norm).some(a =>
+    a === n || (a.length > 2 && n.includes(a)) || words.includes(a)));
 }
 
 export function materialsForStep(c: ReactionConditions | undefined, cat: CatalogProduct[]): StepMaterial[] {
