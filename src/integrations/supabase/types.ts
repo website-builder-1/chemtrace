@@ -89,6 +89,24 @@ export type Database = {
         }
         Relationships: []
       }
+      company_titles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       compound_synonyms: {
         Row: {
           compound_id: string
@@ -334,6 +352,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          disabled: boolean
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          disabled?: boolean
+          display_name?: string | null
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          disabled?: boolean
+          display_name?: string | null
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
       }
       project_items: {
         Row: {
@@ -750,6 +792,29 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_titles: {
+        Row: {
+          title_id: string
+          user_id: string
+        }
+        Insert: {
+          title_id: string
+          user_id: string
+        }
+        Update: {
+          title_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_titles_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "company_titles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       validated_facts: {
         Row: {
