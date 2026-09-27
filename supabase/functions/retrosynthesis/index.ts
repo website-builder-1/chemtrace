@@ -20,9 +20,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const ENGINE_VERSION = "hf-qwen2.5-72b-v1";
-const AI_MODEL = "Qwen/Qwen2.5-72B-Instruct";
 const HF_URL = "https://router.huggingface.co/v1/chat/completions";
+// Ordered fallback chain (all Hugging Face). ":fastest" lets the HF router
+// pick the quickest live provider for that model.
+const HF_MODELS = [
+  "meta-llama/Llama-3.3-70B-Instruct:fastest",
+  "Qwen/Qwen2.5-72B-Instruct:fastest",
+  "Qwen/Qwen2.5-7B-Instruct:fastest",
+];
 
 // ── RDKit (lazy singleton, reused across invocations) ────────────────────
 let rdkitPromise: Promise<unknown> | null = null;
@@ -146,7 +151,10 @@ async function runRetrosynthesisEngine(
     `conditions (solvent, catalyst, reagents, temperature, pressure, time) ` +
     `with a confidence score grounded in literature precedent. Cite a model ` +
     `name or DOI in 'source' and an integer 'precedents' count when you can. ` +
-    `Prefer commercially available starting materials. Reaction SMILES MUST be ` +
+    `Prefer commercially available starting materials. Every reaction must be ` +
+    `chemically correct and atom-plausible (e.g. hydrolysis of ethylene oxide gives ethylene glycol, NOT ethanol). ` +
+    `For simple industrial chemicals, include the real industrial process. `+
+    `Reaction SMILES MUST be ` +
     `"reactants>>product". Do not invent CAS numbers. Output JSON only, ` +
     `matching this TypeScript shape: { routes: Array<{ name: string; score: number; ` +
     `yieldPercent?: number; complexity?: number; decisionReason?: string; ` +
@@ -158,10 +166,15 @@ async function runRetrosynthesisEngine(
   const user = `Target SMILES (canonical): ${canonicalSmiles}\n` +
     `Return JSON conforming to the provided schema with 2–3 routes ranked best-first.`;
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 55_000);
+  // Try a chain of HF models, each with its own time budget, so one slow or
+  // unavailable provider never blocks the whole request.
+  const deadline = Date.now() + 110_000;
   let lastErr: unknown = null;
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (const model of HF_MODELS) {
+    const remaining = deadline - Date.now();
+    if (remaining < 5_000) break;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), Math.min(40_000, remaining));
     try {
       const res = await fetch(HF_URL, {
         method: "POST",
@@ -171,38 +184,52 @@ async function runRetrosynthesisEngine(
           "Authorization": `Bearer ${HF_TOKEN}`,
         },
         body: JSON.stringify({
-          model: AI_MODEL,
+          model,
           messages: [
             { role: "system", content: system },
             { role: "user", content: user },
           ],
           temperature: 0.2,
-          max_tokens: 4096,
+          max_tokens: 3000,
         }),
       });
       if (!res.ok) {
         const body = await res.text();
-        if (res.status === 429 || res.status === 402) {
-          clearTimeout(timeout);
-          throw new Error(`Hugging Face ${res.status}: ${body}`);
-        }
-        lastErr = new Error(`Hugging Face ${res.status}: ${body}`);
-        continue; // retry once
+        lastErr = new Error(`Hugging Face ${res.status} (${model}): ${body.slice(0, 300)}`);
+        console.error(String(lastErr));
+        continue;
       }
       const data = await res.json();
-      clearTimeout(timeout);
-      const raw = data?.choices?.[0]?.message?.content ?? "{}";
-      if (typeof raw !== "string") return raw;
-      // Strip code fences if the model added them despite instructions.
-      const cleaned = raw.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
-      return JSON.parse(cleaned);
+      const raw = data?.choices?.[0]?.message?.content ?? "";
+      const parsed = typeof raw === "string" ? extractJson(raw) : raw;
+      if (parsed && Array.isArray(parsed.routes) && parsed.routes.length) {
+        usedModel = model;
+        return parsed;
+      }
+      lastErr = new Error(`Model ${model} returned unparseable output`);
+      console.error(String(lastErr));
     } catch (e) {
       lastErr = e;
-      if ((e as { name?: string }).name === "AbortError") break;
+      console.error(`model ${model} failed:`, e instanceof Error ? e.message : e);
+    } finally {
+      clearTimeout(timeout);
     }
   }
-  clearTimeout(timeout);
   throw lastErr ?? new Error("Retrosynthesis engine failed");
+}
+
+let usedModel = HF_MODELS[0];
+
+// deno-lint-ignore no-explicit-any
+function extractJson(raw: string): any {
+  const cleaned = raw.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+  try { return JSON.parse(cleaned); } catch { /* fall through */ }
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start >= 0 && end > start) {
+    try { return JSON.parse(cleaned.slice(start, end + 1)); } catch { /* ignore */ }
+  }
+  return null;
 }
 
 // ── Response shaping ─────────────────────────────────────────────────────
@@ -298,7 +325,7 @@ Deno.serve(async (req) => {
         .upsert(
           {
             canonical_smiles: v.canonical,
-            engine: ENGINE_VERSION,
+            engine: `hf:${usedModel}`,
             payload: shaped,
           },
           { onConflict: "canonical_smiles" },
@@ -312,7 +339,7 @@ Deno.serve(async (req) => {
         valid: true,
         canonical_smiles: v.canonical,
         descriptors: { formula: v.formula, mw: v.mw, rings: v.rings },
-        engine: ENGINE_VERSION,
+        engine: `hf:${usedModel}`,
         cached: false,
         routes: shaped,
       }),

@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const HF_MODEL = "Qwen/Qwen2.5-72B-Instruct:novita";
+const HF_MODEL = "meta-llama/Llama-3.3-70B-Instruct:fastest";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -21,7 +21,6 @@ serve(async (req) => {
 
     const hfUrl = "https://router.huggingface.co/v1/chat/completions";
     console.log("Calling HF URL:", hfUrl, "Model:", HF_MODEL);
-    console.log("Token prefix:", HF_TOKEN.substring(0, 10) + "...");
 
     const response = await fetch(hfUrl, {
       method: "POST",
