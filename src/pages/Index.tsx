@@ -361,7 +361,7 @@ export default function Index() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
             <div className="w-8 h-8 border-[3px] rounded-full animate-ct-spin mb-3" style={{ borderColor: 'hsl(var(--ct-teal))', borderTopColor: 'transparent' }} />
-            <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>Running pipeline…</span>
+            <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>Scanning using ChemTraceIt's Chemistry Artificial Intelligence Engine…</span>
           </div>
         )}
 

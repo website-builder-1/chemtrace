@@ -18,6 +18,11 @@ async function callFn(name: string, body: unknown) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   const admin = adminClient();
+  const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+  const { data: u } = await admin.auth.getUser(token);
+  if (!u?.user) return json({ error: "Admins only." }, 403);
+  const { data: isAdmin } = await admin.rpc("has_role", { _user_id: u.user.id, _role: "admin" });
+  if (!isAdmin) return json({ error: "Admins only." }, 403);
   if (await rateLimited(admin, req, "benchmark", 2, 600_000)) return json({ error: "The benchmark was run recently — please wait 10 minutes." }, 429);
   const { data: cases } = await admin.from("benchmark_cases").select("*").order("id");
   // deno-lint-ignore no-explicit-any

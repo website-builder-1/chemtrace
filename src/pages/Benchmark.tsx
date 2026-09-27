@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SiteHeader, SiteFooter } from '@/components/site/SiteChrome';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import NotFound from './NotFound';
 
 interface Run { id: string; created_at: string; engine_version: string | null; summary: Record<string, number | null>; results: Array<{ id: string; category: string; pass: boolean; detail: string; ms: number }> }
 
@@ -13,6 +14,21 @@ const METRICS: Array<[string, string, boolean?]> = [
 ];
 
 export default function Benchmark() {
+  const [allowed, setAllowed] = useState<boolean | null>(null);
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return setAllowed(false);
+      const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').maybeSingle();
+      setAllowed(!!data);
+    })();
+  }, []);
+  if (allowed === null) return null;
+  if (!allowed) return <NotFound />;
+  return <BenchmarkInner />;
+}
+
+function BenchmarkInner() {
   const [runs, setRuns] = useState<Run[]>([]);
   const [running, setRunning] = useState(false);
 

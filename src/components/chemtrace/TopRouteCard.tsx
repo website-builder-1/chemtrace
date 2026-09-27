@@ -6,6 +6,7 @@ import { fmt, type Currency } from '@/lib/currency';
 import { computeGreenMetrics, ratingColor } from '@/lib/greenChem';
 import { searchLiterature, buildQuery, type Citation } from '@/lib/literature';
 import SectionLabel from './SectionLabel';
+import { materialsForStep } from '@/lib/stepMaterials';
 
 const statusStyle = (s: string) => {
   if (s === 'APPROVED') return { color: 'hsl(var(--ct-status-green))', icon: '✓' };
@@ -114,8 +115,8 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
           <span className="font-mono-data uppercase text-[0.6rem] tracking-wider" style={{ color: st.color }}>{st.icon} {route.status}</span>
           <EvidenceBadge level={toEvidenceLevel(route.evidence)} />
           {route.aiGenerated && (
-            <span className="inline-flex items-center gap-1 font-mono-data uppercase text-[0.55rem] tracking-wider px-1.5 py-0.5 rounded-[2px]" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-status-gold))' }} title={`Engine: ${route.engine}`}>
-              <Bot className="w-3 h-3" /> AI-GENERATED · {route.engine}
+            <span className="inline-flex items-center gap-1 font-mono-data uppercase text-[0.55rem] tracking-wider px-1.5 py-0.5 rounded-[2px]" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-status-gold))' }}>
+              <Bot className="w-3 h-3" /> ChemTraceIt AI proposal
             </span>
           )}
           {route.engine === 'verified-literature' && (
@@ -183,6 +184,23 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                   <Sparkles className="w-2.5 h-2.5" /> Explain
                 </button>
                 <ConditionsBlock c={step.conditions} />
+                {materialsForStep(step.conditions).length > 0 && (
+                  <div className="mt-2 rounded-[2px] p-2" style={{ backgroundColor: 'hsl(var(--ct-paper2))' }}>
+                    <div className="font-mono-data uppercase text-[0.55rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-muted))' }}>Where to buy</div>
+                    <ul className="space-y-1">
+                      {materialsForStep(step.conditions).map(m => (
+                        <li key={m.name} className="flex flex-wrap items-center gap-x-2 text-xs font-body" style={{ color: 'hsl(var(--ct-ink))' }}>
+                          <span className="font-medium">{m.name}</span>
+                          <span className="font-mono-data text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>{m.role}{m.cas && ` · CAS ${m.cas}`}</span>
+                          <span className="font-mono-data text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }}>{m.price}</span>
+                          <a href={m.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 underline text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }}>
+                            {m.supplier} <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           ))}

@@ -3,7 +3,7 @@ export type EvidenceLevel = 'documented' | 'supported' | 'hypothesis' | 'insuffi
 const META: Record<EvidenceLevel, { label: string; color: string; hint: string }> = {
   documented: { label: 'Documented', color: 'var(--ct-status-green)', hint: 'Directly supported by a database entry or cited literature.' },
   supported: { label: 'Supported inference', color: 'var(--ct-teal)', hint: 'Follows from documented chemistry by analogy (e.g. a standard reaction template), not a report for this exact case.' },
-  hypothesis: { label: 'Plausible hypothesis', color: 'var(--ct-status-gold)', hint: 'Model-generated. Passed automatic checks but has no supporting source yet.' },
+  hypothesis: { label: 'Plausible hypothesis', color: 'var(--ct-status-gold)', hint: 'Proposed by the ChemTraceIt engine. Passed automatic checks but has no supporting source yet.' },
   insufficient: { label: 'Insufficient evidence', color: 'var(--ct-status-red)', hint: 'No supporting source was found.' },
 };
 
