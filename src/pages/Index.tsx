@@ -13,6 +13,7 @@ import ResultsView from '@/components/chemtrace/ResultsView';
 import RunsDialog from '@/components/chemtrace/RunsDialog';
 import ControlledSubstanceDialog from '@/components/chemtrace/ControlledSubstanceDialog';
 import { screenSubstance, type ScreeningResult } from '@/lib/controlledSubstances';
+import PagesMenu from '@/components/site/PagesMenu';
 
 const LOCATIONS = ['UK', 'EU', 'USA', 'India', 'China', 'Switzerland', 'Japan'];
 
@@ -146,6 +147,8 @@ function SidebarBody(p: SidebarBodyProps) {
 
         {p.userEmail ? (
           <>
+            <PagesMenu />
+            <hr className="my-2" style={{ borderColor: 'hsl(var(--ct-border))', opacity: 0.3 }} />
             <div className="font-mono-data text-[0.65rem] truncate px-1" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>{p.userEmail}</div>
             <button
               onClick={p.onSignOut}
@@ -161,7 +164,7 @@ function SidebarBody(p: SidebarBodyProps) {
             className="w-full flex items-center justify-center gap-2 px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] border transition-colors duration-150"
             style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-sidebar-text))', minHeight: '44px' }}
           >
-            <LogIn className="w-3.5 h-3.5" /> Sign in / Sign up
+            <LogIn className="w-3.5 h-3.5" /> Sign in
           </button>
         )}
       </div>
