@@ -116,6 +116,11 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
               <Bot className="w-3 h-3" /> AI-GENERATED · {route.engine}
             </span>
           )}
+          {route.engine === 'verified-literature' && (
+            <span className="inline-flex items-center gap-1 font-mono-data uppercase text-[0.55rem] tracking-wider px-1.5 py-0.5 rounded-[2px]" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-status-green))' }}>
+              ✓ VERIFIED LITERATURE ROUTE
+            </span>
+          )}
         </div>
 
         {/* Stats */}
