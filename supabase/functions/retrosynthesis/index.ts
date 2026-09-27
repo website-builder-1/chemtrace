@@ -12,7 +12,8 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 // @ts-expect-error - no Deno types for npm: specifier
-import initRDKitModule from "npm:@rdkit/rdkit@2025.3.4-1.0.0";
+import { getRDKit } from "../_shared/chem.ts";
+import { applyTemplates } from "./templates.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,12 +31,6 @@ const HF_MODELS = [
 ];
 
 // ── RDKit (lazy singleton, reused across invocations) ────────────────────
-let rdkitPromise: Promise<unknown> | null = null;
-// deno-lint-ignore no-explicit-any
-async function getRDKit(): Promise<any> {
-  if (!rdkitPromise) rdkitPromise = initRDKitModule();
-  return await rdkitPromise;
-}
 
 interface ValidationResult {
   valid: boolean;
@@ -423,6 +418,7 @@ function shapeRoutes(engineOutput: any, canonical: string) {
     yieldPercent: typeof r.yieldPercent === "number" ? r.yieldPercent : 50,
     complexity: typeof r.complexity === "number" ? r.complexity : undefined,
     decisionReason: r.decisionReason ?? "",
+    evidence: r.evidence ?? "hypothesis",
     startingMaterials: Array.isArray(r.startingMaterials) ? r.startingMaterials : [],
     steps: (Array.isArray(r.steps) ? r.steps : []).map((s: any, j: number) => ({
       number: j + 1,
@@ -531,8 +527,52 @@ Deno.serve(async (req) => {
     // Opportunistic cleanup of old entries
     admin.from("rate_limits").delete().lt("created_at", new Date(Date.now() - 3_600_000).toISOString()).then(() => {});
 
-    const engineOutput = await runRetrosynthesisEngine(v.canonical);
-    const shaped = shapeRoutes(engineOutput, v.canonical);
+    // 1) Documented reactions from the reaction database.
+    // deno-lint-ignore no-explicit-any
+    const documented: any[] = [];
+    const { data: rx } = await admin.from("reactions")
+      .select("id, reaction_smiles, name, reaction_class, source, reaction_conditions(*)")
+      .eq("product_smiles", v.canonical).limit(3);
+    for (const r of rx ?? []) {
+      // deno-lint-ignore no-explicit-any
+      const c: any = (r as any).reaction_conditions?.[0] ?? {};
+      documented.push({
+        name: r.reaction_class ?? r.name ?? "Documented reaction", score: 0.95, yieldPercent: Number(c.yield_percent) || 80,
+        evidence: "documented", decisionReason: `Documented in ${r.source ?? "reaction database"}.`,
+        startingMaterials: r.reaction_smiles.split(">>")[0].split("."),
+        steps: [{ description: r.name ?? "", productSmiles: v.canonical, reactionSmiles: r.reaction_smiles, confidence: 0.95,
+          conditions: { solvent: c.solvent ?? "", catalyst: c.catalyst ?? "", reagents: c.reagents ?? "", temperature: c.temperature ?? "", pressure: c.pressure ?? undefined, time: c.time ?? undefined, source: c.source ?? r.source, evidence: "documented" } }],
+      });
+    }
+    // 2) Deterministic template disconnections (RDKit).
+    const templ = await applyTemplates(v.canonical).catch((e) => { console.error("templates", e); return []; });
+    const templateRoutes = await filterBalancedRoutes(templ.map((t) => ({
+      name: `${t.name} (template)`, score: t.score, yieldPercent: 70, evidence: "analogous",
+      decisionReason: `Standard ${t.name.toLowerCase()} disconnection; conditions are typical textbook conditions (${t.reference}), not a documented example for this exact molecule.`,
+      startingMaterials: t.precursors,
+      steps: [{ description: `${t.name}: ${t.precursors.join(" + ")} → target`, productSmiles: v.canonical, reactionSmiles: t.reactionSmiles, confidence: t.score,
+        conditions: { ...t.conditions, source: t.reference, evidence: "analogous" } }],
+    })), v.canonical);
+    lastRejections = [];
+    // 3) AI proposals only to fill gaps.
+    // deno-lint-ignore no-explicit-any
+    let aiRoutes: any[] = [];
+    let engineName = documented.length ? "reaction-db" : "rdkit-templates";
+    if (documented.length + templateRoutes.length < 3) {
+      try {
+        // deno-lint-ignore no-explicit-any
+        const out: any = await runRetrosynthesisEngine(v.canonical);
+        // deno-lint-ignore no-explicit-any
+        aiRoutes = (out.routes ?? []).map((r: any) => ({ ...r, evidence: "hypothesis" }));
+        engineName = `${engineName}+hf:${usedModel}`;
+      } catch (e) {
+        if (!documented.length && !templateRoutes.length) throw e;
+        console.warn("AI gap-fill failed; returning deterministic routes only", e);
+      }
+    }
+    const combined = [...documented, ...templateRoutes, ...aiRoutes];
+    const shaped = shapeRoutes({ routes: combined }, v.canonical);
+    usedModel = engineName;
 
     // Best-effort cache write (don't fail the request if it errors)
     try {
@@ -541,7 +581,7 @@ Deno.serve(async (req) => {
         .upsert(
           {
             canonical_smiles: v.canonical,
-            engine: `hf:${usedModel}`,
+            engine: usedModel,
             payload: shaped,
           },
           { onConflict: "canonical_smiles" },
@@ -555,7 +595,7 @@ Deno.serve(async (req) => {
         valid: true,
         canonical_smiles: v.canonical,
         descriptors: { formula: v.formula, mw: v.mw, rings: v.rings },
-        engine: `hf:${usedModel}`,
+        engine: usedModel,
         cached: false,
         routes: shaped,
       }),
