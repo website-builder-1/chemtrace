@@ -1,74 +1,57 @@
+# Chemtraceit updates from the team group chat
 
+I went through the chat from 29 June to 27 September 2026. Most of it is meetings, pitches and legal or incorporation talk. Only the items below are actual decisions or problems that affect the website.
 
-# ChemTrace — Implementation Plan
+## Confirmed items to build
 
-## Current State
-The foundation is partially in place: types (`chemtrace.ts`), curated molecule data (`moleculeData.ts`), PubChem client (`pubchem.ts`), export utilities (`exportUtils.ts`), CSS variables, font imports, and keyframe animations are all ready. The Index page is still a placeholder. No UI components exist yet.
+1. **Public landing page (home page)**
+   - Aryan confirmed (13 Sep) that landing pages are next.
+   - Hero message aimed at new compounds. The three key questions come from Emilia's wording (21 Jul):
+     - "How do I synthesise a completely novel compound?"
+     - "Where can I source the starting materials reliably?"
+     - "Which predicted pathway minimises risk and cost?"
+   - Sections: what it does (route planning, reagent sourcing, risk and compliance checks, invoice), how it works in three steps, and a comparison against route-planning-only tools. Synthia is named as the main competitor; Chemtraceit adds risk and compliance on top.
+   - "Try it" button that opens the current tool, which moves to /app.
 
-## Build Order
+2. **Meet the Team page**
+   - Requested 13 Sep.
+   - Cards for Aryan, Emilia (correct spelling, fixed on 21 Jul), Minal and Renee, each with photo, role and short bio.
+   - Uses placeholder photos and text until the team sends the real ones.
 
-### Step 1: Core Layout + Landing Page
-Create `Index.tsx` with the full two-panel layout: fixed sidebar (280px, `#1C1F22`) and scrollable main canvas (`#F8F5EE`). Wire up state for `query`, `batchSize`, `location`, `isLoading`, `results`, `error`. Build the sidebar with wordmark, inputs, and buttons. Build the landing canvas with centered hero block and molecule chips. No separate component files for sidebar/landing — keep inline initially to reduce file count.
+3. **Contact details**
+   - admin@chemtraceit.com shown in the footer and on a simple Contact section (confirmed 16 Aug).
 
-### Step 2: Results View — Sections A through G
-Create individual components under `src/components/chemtrace/`:
-- **SectionLabel.tsx** — reusable section divider
-- **MoleculeIdentityBar.tsx** — SMILES card + 4 metric chips
-- **AIAgentPanel.tsx** — header bar with pulsing dot, initial explanation (hardcoded initially), suggested questions grid, chat history, chat input. Chat sends messages to a Lovable AI edge function.
-- **TopRouteCard.tsx** — recommended route card with stats, pathway steps, reagents, citation, risk
-- **SupplyChainSection.tsx** — regulatory framework, supplier chips, procurement HTML table
-- **AllCandidateRoutes.tsx** — collapsible accordion for each route using Radix Collapsible
-- **ProtocolGenerator.tsx** — generate button, protocol display box
-- **ExportSection.tsx** — four export buttons
-- **ResultsView.tsx** — orchestrates all sections in order
+4. **Stable when several people search at once**
+   - This caused the investor-demo crash (30 Jun), and Renee needs a reliable demo.
+   - One user can only have one search running at a time. Extra clicks are ignored while a search runs, and a clear "already running" note is shown.
+   - Repeat searches for the same molecule are served instantly from saved results.
+   - A short per-visitor limit on the route engine returns a friendly "please wait a moment" message instead of failing.
 
-Wire `ResultsView` into `Index.tsx`, shown when `results` is set.
+5. **Subscriptions via Square (not Stripe)**
+   - Aryan decided on Square on 21 Jul. A free-trial model was discussed.
+   - This needs a plan price and trial length before it can be built. See Open questions.
+   - It will be a separate follow-up plan once those details are confirmed.
 
-### Step 3: Pipeline Logic
-On "Run ChemTrace →": try PubChem first, fall back to curated data. Combine molecule data + routes + regulatory into a `PipelineResults` object. Show loading spinner during fetch.
+## Deliberately not changed
 
-### Step 4: AI Agent Edge Function
-Create `supabase/functions/chemtrace-agent/index.ts` using Lovable AI Gateway (`google/gemini-3-flash-preview`). System prompt is a chemistry expert that receives the molecule context and synthesis routes. Streams responses back. Used for:
-- Initial route analysis (auto-triggered on results load)
-- Chat Q&A
-- Protocol generation
+- **Company name:** stays "Chemtraceit". Rename ideas (LatticeRoute, Hodex, etc.) were never agreed.
+- **Synthia-inspired features:** the list was sent as an image that isn't in the export, so there is nothing concrete to build yet.
+- **"Claude science" suggestion:** an idea only, not a decision. The site stays on Hugging Face AI, as you asked earlier.
 
-### Step 5: Invoice & PDF
-Add an **InvoicePanel.tsx** component within the Supply Chain section. Uses `generateInvoiceData()` from exportUtils. Shows a table of reagent line items with quantities, unit prices, subtotal, VAT, grand total. "Download Invoice (PDF)" button generates PDF client-side using `jsPDF` (add as dependency). "Download Reagents CSV" button uses existing `downloadReagentsCSV()`.
+## Security warning (action for you)
 
-## Technical Decisions
+The chat contains the GitHub login email and password in plain text (25 Aug). Please change that password and turn on two-factor login. Anyone with the export can get in.
 
-| Concern | Decision |
-|---------|----------|
-| AI agent | Lovable AI Gateway via edge function (streams SSE) |
-| Chemical data | PubChem REST API + curated fallback |
-| PDF invoices | jsPDF (client-side) |
-| CSV/JSON export | Client-side Blob downloads (already built) |
-| State | React useState in Index.tsx |
-| Styling | Tailwind + inline hex values matching spec exactly |
-| Fonts | Google Fonts (already loaded in index.html) |
-| Hugging Face | The AI agent functionality is covered by Lovable AI Gateway which provides superior models. HF token can be integrated later for specialized chemistry models if needed. |
+## Open questions
 
-## File Summary
+- Square plan price and trial length. Monthly or yearly?
+- Renee's preferred contact email to show alongside admin@.
+- Team photos and bios for the Meet the Team page.
 
-```text
-New files:
-  src/components/chemtrace/SectionLabel.tsx
-  src/components/chemtrace/MoleculeIdentityBar.tsx
-  src/components/chemtrace/AIAgentPanel.tsx
-  src/components/chemtrace/TopRouteCard.tsx
-  src/components/chemtrace/SupplyChainSection.tsx
-  src/components/chemtrace/AllCandidateRoutes.tsx
-  src/components/chemtrace/ProtocolGenerator.tsx
-  src/components/chemtrace/ExportSection.tsx
-  src/components/chemtrace/InvoicePanel.tsx
-  src/components/chemtrace/ResultsView.tsx
-  supabase/functions/chemtrace-agent/index.ts
+## Technical details
 
-Modified files:
-  src/pages/Index.tsx (full rewrite)
-
-New dependency:
-  jspdf
-```
-
+- Routes: `/` becomes the landing page, the current dashboard moves to `/app`, and `/team` is added. `/auth` stays as it is.
+- New components: `Landing.tsx`, `Team.tsx`, and a shared `SiteHeader` and `SiteFooter` (with mobile menu). They use the existing parchment and teal colours and the existing fonts.
+- Concurrency: an in-flight guard in the `Index.tsx` run handler with the button disabled while running. A per-IP limit in the `retrosynthesis` function (small `rate_limits` table, with GRANTs and RLS, keeping the last N minutes). The existing canonical-SMILES cache is reused.
+- Update index.html meta for the landing page.
+- Square is out of scope for this plan.
