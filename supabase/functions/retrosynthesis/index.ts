@@ -322,7 +322,7 @@ Deno.serve(async (req) => {
         .upsert(
           {
             canonical_smiles: v.canonical,
-            engine: ENGINE_VERSION,
+            engine: `hf:${usedModel}`,
             payload: shaped,
           },
           { onConflict: "canonical_smiles" },
@@ -336,7 +336,7 @@ Deno.serve(async (req) => {
         valid: true,
         canonical_smiles: v.canonical,
         descriptors: { formula: v.formula, mw: v.mw, rings: v.rings },
-        engine: ENGINE_VERSION,
+        engine: `hf:${usedModel}`,
         cached: false,
         routes: shaped,
       }),
