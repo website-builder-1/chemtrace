@@ -349,8 +349,11 @@ async function checkStep(step: any): Promise<"balanced" | "unchecked" | string> 
   const lhs = await repairSmiles(parts[0]), rhs = await repairSmiles(parts[parts.length - 1]);
   step.reactionSmiles = `${lhs}>>${rhs}`;
   const r = await atomCounts(lhs);
-  const p = await atomCounts(rhs.split(".").sort((a, b) => b.length - a.length)[0] ?? "");
+  const p = await atomCounts(rhs);
   if (!r || !p) return "reaction SMILES could not be parsed";
+  const lhsCanon = await Promise.all(lhs.split(".").map(canon));
+  const mainProduct = await canon(rhs.split(".").sort((a, b) => b.length - a.length)[0] ?? "");
+  if (mainProduct && lhsCanon.includes(mainProduct)) return "product is already one of the reactants";
   const text = `${step.description ?? ""} ${JSON.stringify(step.conditions ?? {})}`;
   const reductive = REDUCTIVE.test(text), oxidative = OXIDATIVE.test(text);
   const left: Counts = {};
