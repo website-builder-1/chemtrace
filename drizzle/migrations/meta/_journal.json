@@ -36,6 +36,13 @@
       "when": 1790538220978,
       "tag": "0004_staff_roles_titles",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790539788551,
+      "tag": "0005_add_client_role",
+      "breakpoints": true
     }
   ]
 }
