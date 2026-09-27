@@ -4,13 +4,14 @@ import { SiteHeader, SiteFooter } from '@/components/site/SiteChrome';
 import { useRoles } from '@/hooks/useRoles';
 import { toast } from 'sonner';
 import NotFound from './NotFound';
+import PeopleTab from '@/components/site/PeopleTab';
 import { Btn, Card, Tabs, inputCls, inputStyle, muted, ink } from '@/components/site/StaffUI';
 
-type Tab = 'feedback' | 'facts' | 'suppliers' | 'runs';
+type Tab = 'people' | 'feedback' | 'facts' | 'suppliers' | 'runs';
 
 export default function Moderator() {
   const { loading, isAdmin, isModerator, userId } = useRoles();
-  const [tab, setTab] = useState<Tab>('feedback');
+  const [tab, setTab] = useState<Tab>('people');
   if (loading) return null;
   if (!isAdmin && !isModerator) return <NotFound />;
   return (
@@ -19,7 +20,8 @@ export default function Moderator() {
       <main className="flex-1 max-w-6xl mx-auto px-5 py-12 w-full">
         <div className="font-mono-data text-xs uppercase tracking-[0.2em]" style={{ color: 'hsl(var(--ct-teal))' }}>Moderator</div>
         <h1 className="font-serif-display text-3xl sm:text-4xl mt-2" style={ink}>Review desk</h1>
-        <Tabs<Tab> tabs={[['feedback', 'Feedback'], ['facts', 'Checked facts'], ['suppliers', 'Suppliers & prices'], ['runs', 'Saved runs']]} value={tab} onChange={setTab} />
+        <Tabs<Tab> tabs={[['people', 'People'], ['feedback', 'Feedback'], ['facts', 'Checked facts'], ['suppliers', 'Suppliers & prices'], ['runs', 'Saved runs']]} value={tab} onChange={setTab} />
+        {tab === 'people' && <PeopleTab isAdmin={isAdmin} />}
         {tab === 'feedback' && <FeedbackTab userId={userId!} />}
         {tab === 'facts' && <FactsTab userId={userId!} />}
         {tab === 'suppliers' && <SuppliersTab />}

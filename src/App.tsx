@@ -12,6 +12,8 @@ import Benchmark from "./pages/Benchmark.tsx";
 import Admin from "./pages/Admin.tsx";
 import Moderator from "./pages/Moderator.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Welcome from "./pages/Welcome.tsx";
+import RequireAuth from "./components/site/RequireAuth";
 
 const queryClient = new QueryClient();
 
@@ -23,9 +25,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/app" element={<Index />} />
+          <Route path="/app" element={<RequireAuth><Index /></RequireAuth>} />
           <Route path="/team" element={<Team />} />
-          <Route path="/research" element={<Research />} />
+          <Route path="/research" element={<RequireAuth><Research /></RequireAuth>} />
+          <Route path="/welcome" element={<Welcome />} />
           <Route path="/benchmark" element={<Benchmark />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/benchmark" element={<Benchmark />} />

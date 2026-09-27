@@ -6,10 +6,11 @@ import { resolveCompound } from "../_shared/compounds.ts";
 const ENGINE_VERSION = "cie-0.1";
 const FN_BASE = `${Deno.env.get("SUPABASE_URL")}/functions/v1`;
 
+let CALLER_TOKEN = "";
 async function callFn(name: string, body: unknown) {
   const r = await fetch(`${FN_BASE}/${name}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", apikey: Deno.env.get("SUPABASE_ANON_KEY") ?? "", Authorization: `Bearer ${Deno.env.get("SUPABASE_ANON_KEY") ?? ""}`, "x-forwarded-for": "benchmark" },
+    headers: { "Content-Type": "application/json", apikey: Deno.env.get("SUPABASE_ANON_KEY") ?? "", Authorization: `Bearer ${CALLER_TOKEN}`, "x-forwarded-for": "benchmark" },
     body: JSON.stringify(body),
   });
   return await r.json();
@@ -19,6 +20,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   const admin = adminClient();
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+  CALLER_TOKEN = token;
   const { data: u } = await admin.auth.getUser(token);
   if (!u?.user) return json({ error: "Admins only." }, 403);
   const { data: isAdmin } = await admin.rpc("has_role", { _user_id: u.user.id, _role: "admin" });

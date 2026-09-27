@@ -1,3 +1,4 @@
+import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect, useRef } from 'react';
 import type { PipelineResults, ChatMessage } from '@/types/chemtrace';
 import ReactMarkdown from 'react-markdown';
@@ -37,7 +38,7 @@ export default function AIAgentPanel({ results }: Props) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           messages: userMessages.map(m => ({ role: m.role === 'agent' ? 'assistant' : 'user', content: m.content })),

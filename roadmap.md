@@ -11,3 +11,5 @@
 - [ ] Grow benchmark from 21 to ~50 cases; bulk-import open reaction data (USPTO/ORD)
 - [ ] Optional hosted multi-step retrosynthesis (AiZynthFinder on HF Space)
 - [x] Admin/Moderator logins and pages
+- [x] Invite-only access, client accounts, first-login password + terms signing, people search
+- [ ] Solicitor review of Terms of Use draft (user action)

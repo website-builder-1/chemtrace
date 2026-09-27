@@ -355,25 +355,40 @@ export type Database = {
       }
       profiles: {
         Row: {
+          company: string | null
           created_at: string
           disabled: boolean
           display_name: string | null
           email: string | null
           id: string
+          must_change_password: boolean
+          terms_signed_at: string | null
+          terms_signed_name: string | null
+          terms_version: string | null
         }
         Insert: {
+          company?: string | null
           created_at?: string
           disabled?: boolean
           display_name?: string | null
           email?: string | null
           id: string
+          must_change_password?: boolean
+          terms_signed_at?: string | null
+          terms_signed_name?: string | null
+          terms_version?: string | null
         }
         Update: {
+          company?: string | null
           created_at?: string
           disabled?: boolean
           display_name?: string | null
           email?: string | null
           id?: string
+          must_change_password?: boolean
+          terms_signed_at?: string | null
+          terms_signed_name?: string | null
+          terms_version?: string | null
         }
         Relationships: []
       }
@@ -775,6 +790,33 @@ export type Database = {
         }
         Relationships: []
       }
+      terms_acceptances: {
+        Row: {
+          id: string
+          signed_at: string
+          signed_name: string
+          user_agent: string | null
+          user_id: string
+          version: string
+        }
+        Insert: {
+          id?: string
+          signed_at?: string
+          signed_name: string
+          user_agent?: string | null
+          user_id: string
+          version: string
+        }
+        Update: {
+          id?: string
+          signed_at?: string
+          signed_name?: string
+          user_agent?: string | null
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -881,6 +923,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      complete_onboarding: {
+        Args: { _signed_name: string; _user_agent?: string; _version: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -901,9 +947,10 @@ export type Database = {
           score: number
         }[]
       }
+      mark_password_changed: { Args: never; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1031,7 +1078,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "client"],
     },
   },
 } as const

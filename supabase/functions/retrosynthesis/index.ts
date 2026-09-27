@@ -11,6 +11,7 @@
 // frontend or response contract.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { hasPlatformAccess } from "../_shared/access.ts";
 // @ts-expect-error - no Deno types for npm: specifier
 import { getRDKit } from "../_shared/chem.ts";
 import { applyTemplates } from "./templates.ts";
@@ -465,6 +466,9 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const admin = createClient(supabaseUrl, supabaseKey);
+    if (!(await hasPlatformAccess(admin, req))) {
+      return new Response(JSON.stringify({ valid: false, error: "Please sign in to use Chemtraceit." }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     // Verified literature routes take priority over any AI output.
     const { data: verified } = await admin
