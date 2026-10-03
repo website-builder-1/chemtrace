@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SiteHeader, SiteFooter } from '@/components/site/SiteChrome';
 import { EvidenceBadge, toEvidenceLevel } from '@/components/chemtrace/EvidenceBadge';
 import { toast } from 'sonner';
-import { Loader2, ExternalLink, BookmarkPlus } from 'lucide-react';
+import { Loader2, ExternalLink, BookmarkPlus, ChevronDown } from 'lucide-react';
 
 interface Evidence { id: string; kind: string; title: string; source: string; year?: number; url?: string; excerpt: string }
 interface Claim { text: string; label: string; evidence: string[] }
@@ -98,14 +98,20 @@ export default function Research() {
             onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) ask(); }}
           />
           <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
-            <div className="flex gap-1 font-mono-data text-[0.65rem] uppercase">
-              {(['auto', 'easy', 'medium', 'hard'] as const).map(t => (
-                <button type="button" key={t} onClick={() => setTier(t)} className="px-2 py-1 rounded-[2px] border"
-                  style={{ borderColor: 'hsl(var(--ct-border))', backgroundColor: tier === t ? 'hsl(var(--ct-teal))' : 'transparent', color: tier === t ? 'hsl(var(--ct-paper))' : 'hsl(var(--ct-muted))' }}>
-                  {t === 'auto' ? 'Auto depth' : t}
-                </button>
-              ))}
-            </div>
+            <label className="relative inline-flex items-center font-mono-data text-[0.65rem] uppercase">
+              <span className="sr-only">Answer depth</span>
+              <select
+                value={tier} onChange={e => setTier(e.target.value as typeof tier)}
+                className="appearance-none pl-3 pr-8 py-1.5 rounded-[2px] border bg-transparent outline-none cursor-pointer"
+                style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-ink))', backgroundColor: 'hsl(var(--ct-paper))' }}
+              >
+                <option value="auto">Auto depth</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 absolute right-2 pointer-events-none" style={{ color: 'hsl(var(--ct-muted))' }} />
+            </label>
             <button type="submit" disabled={loading || !q.trim()} className="px-5 py-2 rounded-[3px] font-mono-data text-xs uppercase tracking-wider disabled:opacity-50 inline-flex items-center gap-2"
               style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>
               {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />} {loading ? 'Researching…' : 'Ask'}
