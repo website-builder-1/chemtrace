@@ -6,13 +6,13 @@ import { buildSupplierUrl } from './supplierLinks';
 export interface CatalogProduct {
   id: string; supplier: string; material_key: string; aliases: string[]; product_name: string; smiles: string | null;
   cas: string | null; pack_size: string; price: number | null; currency: string; product_url: string; price_note: string;
-  price_source: string; updated_at: string; price_checked_at: string | null;
+  country: string; price_source: string; updated_at: string; price_checked_at: string | null;
 }
 export interface StepMaterial { name: string; role: string; offers: CatalogProduct[]; fallbackUrl: string }
 
-const SELECT = 'id, material_key, aliases, product_name, smiles, cas, pack_size, price, currency, product_url, price_note, price_source, updated_at, price_checked_at, suppliers(name)';
+const SELECT = 'id, material_key, aliases, product_name, smiles, cas, pack_size, price, currency, product_url, price_note, price_source, updated_at, price_checked_at, suppliers(name, country)';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const toProduct = (r: any): CatalogProduct => ({ ...r, supplier: r.suppliers?.name ?? '' });
+const toProduct = (r: any): CatalogProduct => ({ ...r, supplier: r.suppliers?.name ?? '', country: r.suppliers?.country ?? '' });
 
 let current: CatalogProduct[] = [];
 let loaded: Promise<void> | null = null;
@@ -93,4 +93,14 @@ export function priceLabel(o: CatalogProduct): string {
   if (o.price_source === 'auto') return `Live from supplier · ${when}`;
   if (o.price_source === 'manual') return `Checked by ChemTraceIt staff · ${when}`;
   return `Estimated list price · ${when}`;
+}
+
+/** Replace a placeholder procurement row with the cheapest live catalog offer (by SMILES or name). */
+export function enrichReagent<T extends { name: string; cas: string; supplier: string; country: string; price: string; availability: string; productUrl?: string }>(r: T, cat: CatalogProduct[]): T {
+  const offers = cat.filter(p => p.smiles === r.name);
+  const o = best(offers.length ? offers : match(r.name, cat))[0];
+  if (!o) return { ...r, supplier: 'Not in catalogue', country: '—', price: 'Search suppliers', availability: 'Unconfirmed', productUrl: buildSupplierUrl('Sigma-Aldrich', '', r.name) };
+  return { ...r, name: o.smiles === r.name ? o.material_key : r.name, cas: o.cas ?? r.cas, supplier: o.supplier, country: o.country || '—',
+    price: o.price != null ? `${o.currency} ${o.price} / ${o.pack_size}` : `Quote on request (${o.pack_size})`,
+    availability: priceLabel(o), productUrl: o.product_url };
 }

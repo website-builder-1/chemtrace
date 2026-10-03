@@ -2,6 +2,7 @@ import type { PipelineResults } from '@/types/chemtrace';
 import SectionLabel from './SectionLabel';
 import { ExternalLink } from 'lucide-react';
 import { buildSupplierUrl } from '@/lib/supplierLinks';
+import { useSupplierCatalog, enrichReagent } from '@/lib/stepMaterials';
 
 const statusChip = (s: string) => {
   const map: Record<string, { bg: string; text: string; icon: string }> = {
@@ -22,7 +23,8 @@ const riskDot = (r: string) => {
 export default function SupplyChainSection({ results }: { results: PipelineResults }) {
   const { regulatory, location } = results;
   const rec = results.routes.find(r => r.id === results.recommendedRouteId)!;
-  const reagents = rec.reagentProcurement;
+  const catalog = useSupplierCatalog();
+  const reagents = rec.reagentProcurement.map(r => enrichReagent(r, catalog));
 
   return (
     <section>
@@ -69,7 +71,7 @@ export default function SupplyChainSection({ results }: { results: PipelineResul
               const chip = statusChip(r.status);
               return (
                 <tr
-                  key={r.cas}
+                  key={r.name + i}
                   className="transition-colors duration-150"
                   style={{
                     backgroundColor: i % 2 === 0 ? 'hsl(var(--ct-paper2))' : 'hsl(var(--card))',
@@ -125,7 +127,7 @@ export default function SupplyChainSection({ results }: { results: PipelineResul
       </div>
 
       <p className="font-body italic text-[0.7rem] mt-3" style={{ color: 'hsl(var(--ct-muted))' }}>
-        Prices shown are indicative list prices captured at the time of curation in the listed pack size and currency. Supplier and price columns link out to the supplier's product search — confirm live pricing, pack size, lead time, and shipping restrictions before placing an order.
+        Supplier, country and price come live from the ChemTraceIt supplier catalogue (cheapest listed offer) and update as soon as staff or the daily check change them. Links open the supplier's product page — confirm live pricing, pack size, lead time, and shipping restrictions before placing an order.
       </p>
     </section>
   );
