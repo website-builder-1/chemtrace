@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { SynthesisRoute } from '@/types/chemtrace';
 import SectionLabel from './SectionLabel';
 import { ChevronRight } from 'lucide-react';
+import { useSupplierCatalog, enrichReagent } from '@/lib/stepMaterials';
 
 const statusColor = (s: string) => {
   if (s === 'APPROVED') return 'hsl(var(--ct-status-green))';
@@ -17,6 +18,7 @@ const riskColor = (r: string) => {
 
 export default function AllCandidateRoutes({ routes, location }: { routes: SynthesisRoute[]; location: string }) {
   const [open, setOpen] = useState<string | null>(null);
+  const catalog = useSupplierCatalog();
 
   return (
     <section>
@@ -79,8 +81,8 @@ export default function AllCandidateRoutes({ routes, location }: { routes: Synth
                           </tr>
                         </thead>
                         <tbody>
-                          {route.reagentProcurement.map((r, i) => (
-                            <tr key={r.cas} style={{ backgroundColor: i % 2 === 0 ? 'hsl(var(--ct-paper2))' : 'hsl(var(--card))', borderBottom: '1px solid hsl(var(--ct-border))' }}>
+                          {route.reagentProcurement.map(r => enrichReagent(r, catalog)).map((r, i) => (
+                            <tr key={r.name + i} style={{ backgroundColor: i % 2 === 0 ? 'hsl(var(--ct-paper2))' : 'hsl(var(--card))', borderBottom: '1px solid hsl(var(--ct-border))' }}>
                               <td className="font-body px-2 py-1">{r.name}</td>
                               <td className="font-body px-2 py-1">{r.supplier} ({r.country})</td>
                               <td className="font-mono-data px-2 py-1">{r.price}</td>
