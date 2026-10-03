@@ -22,9 +22,8 @@ export default function Research() {
   const [res, setRes] = useState<Result | null>(null);
   const [asked, setAsked] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
-  const [fbRating, setFbRating] = useState<string | null>(null);
+  const [fbRating, setFbRating] = useState<'good' | 'bad' | null>(null);
   const [fbText, setFbText] = useState('');
-  const [fbSource, setFbSource] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
@@ -49,13 +48,12 @@ export default function Research() {
 
   async function sendFeedback() {
     if (!userId || !res || !fbRating) return;
-    const needsText = fbRating !== 'good';
-    if (needsText && !fbText.trim()) { toast.error('Please describe what was wrong.'); return; }
+    if (fbRating === 'bad' && !fbText.trim()) { toast.error('Please add a short comment about what was wrong.'); return; }
     const { error } = await supabase.from('feedback').insert({
       user_id: userId, question: asked, answer: res.answer, rating: fbRating,
-      correction: fbText.trim() || null, reason: RATINGS.find(r => r.v === fbRating)?.l ?? null, source: fbSource.trim() || null,
+      correction: fbText.trim() || null, reason: fbRating === 'good' ? 'Thumbs up' : 'Thumbs down',
     });
-    if (error) toast.error(error.message); else { toast.success('Thanks — your feedback was recorded for review.'); setFbRating(null); setFbText(''); setFbSource(''); }
+    if (error) toast.error(error.message); else { toast.success('Thanks — your feedback was recorded for review.'); setFbRating(null); setFbText(''); }
   }
 
   async function saveToProject() {
