@@ -5,16 +5,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { SiteHeader, SiteFooter } from '@/components/site/SiteChrome';
 import { EvidenceBadge, toEvidenceLevel } from '@/components/chemtrace/EvidenceBadge';
 import { toast } from 'sonner';
-import { Loader2, ExternalLink, BookmarkPlus, ChevronDown } from 'lucide-react';
+import { Loader2, ExternalLink, BookmarkPlus, ChevronDown, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface Evidence { id: string; kind: string; title: string; source: string; year?: number; url?: string; excerpt: string }
 interface Claim { text: string; label: string; evidence: string[] }
 interface Result { tier?: string; answer: string; claims: Claim[]; evidence: Evidence[]; trace?: string[]; model?: string; blocked?: boolean; latency_ms?: number }
 
-const RATINGS = [
-  { v: 'good', l: 'Good' }, { v: 'bad', l: 'Bad' }, { v: 'correct_this', l: 'Correct this' },
-  { v: 'source_wrong', l: 'Source is wrong' }, { v: 'chemistry_wrong', l: 'Chemistry is wrong' }, { v: 'missing_info', l: 'Missing information' },
-];
 
 const muted = { color: 'hsl(var(--ct-muted))' };
 const ink = { color: 'hsl(var(--ct-ink))' };
@@ -26,9 +22,8 @@ export default function Research() {
   const [res, setRes] = useState<Result | null>(null);
   const [asked, setAsked] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
-  const [fbRating, setFbRating] = useState<string | null>(null);
+  const [fbRating, setFbRating] = useState<'good' | 'bad' | null>(null);
   const [fbText, setFbText] = useState('');
-  const [fbSource, setFbSource] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
@@ -53,13 +48,12 @@ export default function Research() {
 
   async function sendFeedback() {
     if (!userId || !res || !fbRating) return;
-    const needsText = fbRating !== 'good';
-    if (needsText && !fbText.trim()) { toast.error('Please describe what was wrong.'); return; }
+    if (fbRating === 'bad' && !fbText.trim()) { toast.error('Please add a short comment about what was wrong.'); return; }
     const { error } = await supabase.from('feedback').insert({
       user_id: userId, question: asked, answer: res.answer, rating: fbRating,
-      correction: fbText.trim() || null, reason: RATINGS.find(r => r.v === fbRating)?.l ?? null, source: fbSource.trim() || null,
+      correction: fbText.trim() || null, reason: fbRating === 'good' ? 'Thumbs up' : 'Thumbs down',
     });
-    if (error) toast.error(error.message); else { toast.success('Thanks — your feedback was recorded for review.'); setFbRating(null); setFbText(''); setFbSource(''); }
+    if (error) toast.error(error.message); else { toast.success('Thanks — your feedback was recorded for review.'); setFbRating(null); setFbText(''); }
   }
 
   async function saveToProject() {
@@ -175,26 +169,25 @@ export default function Research() {
                   <p className="font-body text-sm" style={muted}><Link to="/auth" className="underline" style={{ color: 'hsl(var(--ct-teal))' }}>Sign in</Link> to rate answers and submit corrections.</p>
                 ) : (
                   <>
-                    <div className="flex flex-wrap gap-2">
-                      {RATINGS.map(r => (
-                        <button key={r.v} onClick={() => setFbRating(r.v)} className="px-2.5 py-1 rounded-[2px] border font-mono-data text-[0.65rem] uppercase"
-                          style={{ borderColor: 'hsl(var(--ct-border))', backgroundColor: fbRating === r.v ? 'hsl(var(--ct-teal))' : 'transparent', color: fbRating === r.v ? 'hsl(var(--ct-paper))' : 'hsl(var(--ct-ink))' }}>
-                          {r.l}
-                        </button>
-                      ))}
+                    <div className="flex gap-2">
+                      <button onClick={() => setFbRating('good')} aria-label="Thumbs up" title="This answer was right"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] border font-mono-data text-[0.65rem] uppercase"
+                        style={{ borderColor: 'hsl(var(--ct-border))', backgroundColor: fbRating === 'good' ? 'hsl(var(--ct-teal))' : 'transparent', color: fbRating === 'good' ? 'hsl(var(--ct-paper))' : 'hsl(var(--ct-ink))' }}>
+                        <ThumbsUp className="w-4 h-4" /> Right
+                      </button>
+                      <button onClick={() => setFbRating('bad')} aria-label="Thumbs down" title="This answer was wrong"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] border font-mono-data text-[0.65rem] uppercase"
+                        style={{ borderColor: 'hsl(var(--ct-border))', backgroundColor: fbRating === 'bad' ? 'hsl(var(--ct-teal))' : 'transparent', color: fbRating === 'bad' ? 'hsl(var(--ct-paper))' : 'hsl(var(--ct-ink))' }}>
+                        <ThumbsDown className="w-4 h-4" /> Wrong
+                      </button>
                     </div>
                     {fbRating && (
                       <div className="mt-3 space-y-2">
-                        {fbRating !== 'good' && (
-                          <textarea value={fbText} onChange={e => setFbText(e.target.value)} rows={3} maxLength={2000} placeholder="What's wrong, and what's the correct information?"
-                            className="w-full border rounded-[2px] p-2 font-body text-sm bg-transparent" style={{ borderColor: 'hsl(var(--ct-border))', ...ink }} />
-                        )}
-                        {fbRating !== 'good' && (
-                          <input value={fbSource} onChange={e => setFbSource(e.target.value)} maxLength={500} placeholder="Source (DOI or URL), optional"
-                            className="w-full border rounded-[2px] p-2 font-body text-sm bg-transparent" style={{ borderColor: 'hsl(var(--ct-border))', ...ink }} />
-                        )}
+                        <textarea value={fbText} onChange={e => setFbText(e.target.value)} rows={3} maxLength={2000}
+                          placeholder={fbRating === 'bad' ? "What's wrong, and what's the correct information?" : 'Anything to add? (optional)'}
+                          className="w-full border rounded-[2px] p-2 font-body text-sm bg-transparent" style={{ borderColor: 'hsl(var(--ct-border))', ...ink }} />
                         <button onClick={sendFeedback} className="px-4 py-1.5 rounded-[3px] font-mono-data text-xs uppercase" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>Submit</button>
-                        <p className="font-body text-xs" style={muted}>Corrections are reviewed before anything is treated as validated knowledge.</p>
+                        <p className="font-body text-xs" style={muted}>Comments are reviewed before anything is treated as validated knowledge.</p>
                       </div>
                     )}
                   </>
