@@ -5,16 +5,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { SiteHeader, SiteFooter } from '@/components/site/SiteChrome';
 import { EvidenceBadge, toEvidenceLevel } from '@/components/chemtrace/EvidenceBadge';
 import { toast } from 'sonner';
-import { Loader2, ExternalLink, BookmarkPlus, ChevronDown } from 'lucide-react';
+import { Loader2, ExternalLink, BookmarkPlus, ChevronDown, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface Evidence { id: string; kind: string; title: string; source: string; year?: number; url?: string; excerpt: string }
 interface Claim { text: string; label: string; evidence: string[] }
 interface Result { tier?: string; answer: string; claims: Claim[]; evidence: Evidence[]; trace?: string[]; model?: string; blocked?: boolean; latency_ms?: number }
 
-const RATINGS = [
-  { v: 'good', l: 'Good' }, { v: 'bad', l: 'Bad' }, { v: 'correct_this', l: 'Correct this' },
-  { v: 'source_wrong', l: 'Source is wrong' }, { v: 'chemistry_wrong', l: 'Chemistry is wrong' }, { v: 'missing_info', l: 'Missing information' },
-];
 
 const muted = { color: 'hsl(var(--ct-muted))' };
 const ink = { color: 'hsl(var(--ct-ink))' };
