@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Trash2, FlaskConical, X } from 'lucide-react';
+import { Trash2, X } from 'lucide-react';
+import logoMark from '@/assets/logo.png';
 import { supabase } from '@/integrations/supabase/client';
 import type { PipelineResults } from '@/types/chemtrace';
 import { toast } from 'sonner';
@@ -90,7 +91,7 @@ export default function RunsDialog({ open, onClose, onLoadRun }: Props) {
           )}
           {!loading && runs.length === 0 && (
             <div className="text-center py-12">
-              <FlaskConical className="w-10 h-10 mx-auto mb-2" style={{ color: 'hsl(var(--ct-muted))' }} />
+              <img src={logoMark} alt="" className="h-10 w-auto mx-auto mb-2 opacity-40" />
               <p className="font-body text-sm" style={{ color: 'hsl(var(--ct-muted))' }}>
                 No saved runs yet. Run a pipeline and click <strong>Save Run</strong> to keep it here.
               </p>

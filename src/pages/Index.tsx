@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrandLogo } from '@/components/site/BrandLogo';
+import logoMark from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X, LogIn, LogOut, Save, History } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -374,7 +375,7 @@ export default function Index() {
         {!results && !isLoading && !error && (
           <div className="flex items-center justify-center h-full min-h-[500px]">
             <div className="max-w-[540px] text-center w-full">
-              <div className="font-serif-display text-5xl sm:text-6xl mb-3" style={{ color: 'hsl(var(--ct-teal))' }}>⚗</div>
+              <div className="flex justify-center mb-4"><img src={logoMark} alt="Chemtraceit" className="h-16 sm:h-20 w-auto" /></div>
               <h1 className="font-serif-display font-bold text-xl sm:text-2xl mb-3" style={{ color: 'hsl(var(--ct-ink))', lineHeight: 1.2 }}>Autonomous Reaction Scouting</h1>
               <p className="font-body text-sm sm:text-base leading-[1.7] mb-5" style={{ color: 'hsl(var(--ct-muted))' }}>
                 Enter a molecule name or SMILES string. Chemtraceit evaluates synthesis routes, checks reagent supply chains, assesses regulatory compliance, and recommends the optimal pathway for your production location and batch size.
