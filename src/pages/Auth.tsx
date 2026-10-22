@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import logo from '@/assets/logo.png';
+import { BrandHero } from '@/components/site/BrandLogo';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -31,12 +31,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
       <div className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <div className="font-serif-display text-4xl mb-2" style={{ color: 'hsl(var(--ct-teal))' }}>⚗</div>
-          <img src={logo} alt="Chemtraceit logo" className="h-14 w-auto mb-3" />
-          <h1 className="font-serif-display font-bold text-2xl" style={{ color: 'hsl(var(--ct-ink))' }}>Chemtraceit</h1>
-          <p className="font-mono-data uppercase text-[0.6rem] tracking-[0.15em] mt-1" style={{ color: 'hsl(var(--ct-muted))' }}>SYNTHESIS INTELLIGENCE</p>
-        </div>
+        <BrandHero subtitle="Synthesis intelligence" />
 
         <div className="bg-card border rounded-[3px] p-5 sm:p-6" style={{ borderColor: 'hsl(var(--ct-border))' }}>
           <h2 className="font-serif-display text-lg mb-1" style={{ color: 'hsl(var(--ct-ink))' }}>Sign in</h2>

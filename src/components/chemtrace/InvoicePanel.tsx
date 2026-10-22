@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import logo from '@/assets/logo.png';
+import { BrandLogo } from '@/components/site/BrandLogo';
 import jsPDF from 'jspdf';
 import type { PipelineResults } from '@/types/chemtrace';
 import { generateInvoiceData, downloadReagentsCSV } from '@/lib/exportUtils';
@@ -101,7 +101,7 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
         <div className="bg-card border rounded-[3px] p-5" style={{ borderColor: 'hsl(var(--ct-border))' }}>
           <div className="flex justify-between items-start mb-4">
             <div>
-              <div className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-teal))' }}><span className="flex items-center gap-2"><img src={logo} alt="" className="h-5 w-auto" />Chemtraceit</span></div>
+              <BrandLogo size="sm" />
               <div className="font-mono-data text-[0.6rem] uppercase tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>REAGENT INVOICE</div>
             </div>
             <div className="text-right font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>

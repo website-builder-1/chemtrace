@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import logoLight from '@/assets/logo-light.png';
+import { BrandLogo } from '@/components/site/BrandLogo';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useRoles } from '@/hooks/useRoles';
@@ -25,9 +25,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-teal))' }}>
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 font-serif-display text-xl" style={{ color: 'hsl(var(--ct-paper))' }}>
-          <img src={logoLight} alt="" className="h-7 w-auto" /> Chemtraceit
-        </Link>
+        <Link to="/" aria-label="Chemtraceit home"><BrandLogo tone="light" /></Link>
         <nav className="hidden md:flex items-center gap-7 font-mono-data text-xs uppercase tracking-wider">
           {all.map(l => (
             <NavLink key={l.to} to={l.to} className="hover:opacity-80" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</NavLink>
@@ -57,7 +55,7 @@ export function SiteFooter() {
     <footer id="contact" className="border-t" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-teal))' }}>
       <div className="max-w-6xl mx-auto px-5 py-10 grid gap-6 md:grid-cols-3">
         <div>
-          <div className="font-serif-display text-lg flex items-center gap-2" style={{ color: 'hsl(var(--ct-paper))' }}><img src={logoLight} alt="" className="h-6 w-auto" />Chemtraceit</div>
+          <BrandLogo tone="light" size="sm" />
           <p className="font-body text-sm mt-2" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>Synthesis intelligence: routes, sourcing, risk and cost in one place.</p>
         </div>
         <div>
