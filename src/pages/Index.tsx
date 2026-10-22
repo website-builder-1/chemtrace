@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo-light.png';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X, LogIn, LogOut, Save, History } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
