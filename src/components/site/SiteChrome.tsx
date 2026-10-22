@@ -25,20 +25,20 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-teal))' }}>
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-        <Link to="/" aria-label="Chemtraceit home"><BrandLogo tone="light" /></Link>
-        <nav className="hidden md:flex items-center gap-7 font-mono-data text-xs uppercase tracking-wider">
+        <Link to="/" aria-label="Chemtraceit home" className="shrink-0"><BrandLogo tone="light" /></Link>
+        <nav className="hidden lg:flex items-center gap-6 font-mono-data text-xs uppercase tracking-wider whitespace-nowrap">
           {all.map(l => (
-            <NavLink key={l.to} to={l.to} className="hover:opacity-80" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</NavLink>
+            <NavLink key={l.to} to={l.to} className="hover:opacity-80 shrink-0" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</NavLink>
           ))}
-          {userId && <button onClick={signOut} className="hover:opacity-80 uppercase" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>Sign out</button>}
-          <Link to={cta.to} className="px-4 py-2 rounded-[3px]" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>{cta.label}</Link>
+          {userId && <button onClick={signOut} className="hover:opacity-80 uppercase shrink-0" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>Sign out</button>}
+          <Link to={cta.to} className="px-4 py-2 rounded-[3px] shrink-0" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>{cta.label}</Link>
         </nav>
-        <button className="md:hidden" aria-label="Menu" onClick={() => setOpen(o => !o)} style={{ color: 'hsl(var(--ct-paper))' }}>
+        <button className="lg:hidden" aria-label="Menu" onClick={() => setOpen(o => !o)} style={{ color: 'hsl(var(--ct-paper))' }}>
           {open ? <X /> : <Menu />}
         </button>
       </div>
       {open && (
-        <nav className="md:hidden flex flex-col gap-4 px-5 pb-5 font-mono-data text-sm uppercase tracking-wider">
+        <nav className="lg:hidden flex flex-col gap-4 px-5 pb-5 font-mono-data text-sm uppercase tracking-wider">
           {all.map(l => (
             <Link key={l.to} to={l.to} onClick={() => setOpen(false)} style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</Link>
           ))}
