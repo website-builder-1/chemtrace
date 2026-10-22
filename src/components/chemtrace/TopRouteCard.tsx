@@ -1,6 +1,7 @@
 import { EvidenceBadge, toEvidenceLevel } from './EvidenceBadge';
 import { useEffect, useState } from 'react';
-import { ExternalLink, Sparkles, Leaf, FlaskConical, Bot } from 'lucide-react';
+import logoMark from '@/assets/logo.png';
+import { ExternalLink, Sparkles, Leaf, Bot } from 'lucide-react';
 import type { SynthesisRoute, MoleculeData, ReactionConditions } from '@/types/chemtrace';
 import { fmt, type Currency } from '@/lib/currency';
 import { computeGreenMetrics, ratingColor } from '@/lib/greenChem';
@@ -52,7 +53,7 @@ function ConditionsBlock({ c }: { c?: ReactionConditions }) {
   return (
     <div className="mt-1.5 ml-7 p-2 rounded-[3px] border" style={{ backgroundColor: 'hsl(var(--ct-paper2))', borderColor: 'hsl(var(--ct-border))' }}>
       <div className="flex items-center gap-1.5 mb-1.5">
-        <FlaskConical className="w-3 h-3" style={{ color: 'hsl(var(--ct-teal))' }} />
+        <img src={logoMark} alt="" className="h-3 w-auto" />
         <span className="font-mono-data uppercase text-[0.55rem] tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>PREDICTED CONDITIONS</span>
         {typeof c.confidence === 'number' && (
           <span className="font-mono-data text-[0.55rem] px-1 py-px rounded-[2px]" style={{ color: 'white', backgroundColor: c.confidence >= 0.7 ? 'hsl(var(--ct-status-green))' : c.confidence >= 0.4 ? 'hsl(var(--ct-status-gold))' : 'hsl(var(--ct-status-red))' }}>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import logo from '@/assets/logo.png';
+import { BrandHero } from '@/components/site/BrandLogo';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -28,11 +28,7 @@ export default function Welcome() {
   return (
     <div className="min-h-screen px-4 py-10" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-6">
-          <img src={logo} alt="Chemtraceit logo" className="h-14 w-auto mb-3" />
-          <h1 className="font-serif-display font-bold text-2xl" style={{ color: 'hsl(var(--ct-ink))' }}>Welcome to Chemtraceit</h1>
-          <p className="font-mono-data uppercase text-[0.6rem] tracking-[0.15em] mt-1" style={{ color: 'hsl(var(--ct-muted))' }}>Step {step} of 2 · {step === 1 ? 'Set your password' : 'Terms of use'}</p>
-        </div>
+        <BrandHero subtitle={`Welcome · Step ${step} of 2 · ${step === 1 ? "Set your password" : "Terms of use"}`} />
         {step === 1 ? <PasswordStep onDone={r.reload} /> : <TermsStep onDone={() => { r.reload(); navigate('/app'); }} />}
         <button onClick={async () => { await supabase.auth.signOut(); navigate('/'); }} className="block mx-auto mt-4 font-mono-data text-[0.7rem] uppercase tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>Sign out</button>
       </div>

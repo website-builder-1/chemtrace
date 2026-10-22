@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import logo from '@/assets/logo-light.png';
+import { BrandLogo } from '@/components/site/BrandLogo';
+import logoMark from '@/assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X, LogIn, LogOut, Save, History } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -43,7 +44,7 @@ function SidebarBody(p: SidebarBodyProps) {
   return (
     <div className="flex flex-col h-full p-5 overflow-y-auto" style={{ backgroundColor: 'hsl(var(--ct-sidebar))' }}>
       <div className="mb-1">
-        <div className="font-serif-display font-bold text-xl" style={{ color: 'hsl(var(--ct-teal))' }}><span className="flex items-center gap-2"><img src={logo} alt="" className="h-6 w-auto" />Chemtraceit</span></div>
+        <div><BrandLogo tone="light" /></div>
         <div className="font-mono-data uppercase text-[0.55rem] tracking-[0.15em]" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>SYNTHESIS INTELLIGENCE</div>
       </div>
 
@@ -342,7 +343,7 @@ export default function Index() {
         className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3"
         style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderBottom: '2px solid hsl(var(--ct-teal))' }}
       >
-        <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-teal))' }}><span className="inline-flex items-center gap-2"><img src={logo} alt="" className="h-5 w-auto" />Chemtraceit</span></span>
+        <BrandLogo tone="light" size="sm" />
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <button aria-label="Open menu" className="flex items-center justify-center rounded-[3px] text-white" style={{ minWidth: '44px', minHeight: '44px' }}>
@@ -374,7 +375,7 @@ export default function Index() {
         {!results && !isLoading && !error && (
           <div className="flex items-center justify-center h-full min-h-[500px]">
             <div className="max-w-[540px] text-center w-full">
-              <div className="font-serif-display text-5xl sm:text-6xl mb-3" style={{ color: 'hsl(var(--ct-teal))' }}>⚗</div>
+              <div className="flex justify-center mb-4"><img src={logoMark} alt="Chemtraceit" className="h-16 sm:h-20 w-auto" /></div>
               <h1 className="font-serif-display font-bold text-xl sm:text-2xl mb-3" style={{ color: 'hsl(var(--ct-ink))', lineHeight: 1.2 }}>Autonomous Reaction Scouting</h1>
               <p className="font-body text-sm sm:text-base leading-[1.7] mb-5" style={{ color: 'hsl(var(--ct-muted))' }}>
                 Enter a molecule name or SMILES string. Chemtraceit evaluates synthesis routes, checks reagent supply chains, assesses regulatory compliance, and recommends the optimal pathway for your production location and batch size.
