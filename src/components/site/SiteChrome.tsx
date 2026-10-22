@@ -38,7 +38,7 @@ export function SiteHeader() {
         </button>
       </div>
       {open && (
-        <nav className="md:hidden flex flex-col gap-4 px-5 pb-5 font-mono-data text-sm uppercase tracking-wider">
+        <nav className="lg:hidden flex flex-col gap-4 px-5 pb-5 font-mono-data text-sm uppercase tracking-wider">
           {all.map(l => (
             <Link key={l.to} to={l.to} onClick={() => setOpen(false)} style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</Link>
           ))}
