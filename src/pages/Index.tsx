@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import logo from '@/assets/logo-light.png';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X, LogIn, LogOut, Save, History } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -42,7 +43,7 @@ function SidebarBody(p: SidebarBodyProps) {
   return (
     <div className="flex flex-col h-full p-5 overflow-y-auto" style={{ backgroundColor: 'hsl(var(--ct-sidebar))' }}>
       <div className="mb-1">
-        <div className="font-serif-display font-bold text-xl" style={{ color: 'hsl(var(--ct-teal))' }}>⚗ Chemtraceit</div>
+        <div className="font-serif-display font-bold text-xl" style={{ color: 'hsl(var(--ct-teal))' }}><span className="flex items-center gap-2"><img src={logo} alt="" className="h-6 w-auto" />Chemtraceit</span></div>
         <div className="font-mono-data uppercase text-[0.55rem] tracking-[0.15em]" style={{ color: 'hsl(var(--ct-sidebar-label))' }}>SYNTHESIS INTELLIGENCE</div>
       </div>
 
@@ -341,7 +342,7 @@ export default function Index() {
         className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3"
         style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderBottom: '2px solid hsl(var(--ct-teal))' }}
       >
-        <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-teal))' }}>⚗ Chemtraceit</span>
+        <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-teal))' }}><span className="inline-flex items-center gap-2"><img src={logo} alt="" className="h-5 w-auto" />Chemtraceit</span></span>
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <button aria-label="Open menu" className="flex items-center justify-center rounded-[3px] text-white" style={{ minWidth: '44px', minHeight: '44px' }}>

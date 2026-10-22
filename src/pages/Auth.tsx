@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import logo from '@/assets/logo.png';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -32,6 +33,7 @@ export default function Auth() {
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
           <div className="font-serif-display text-4xl mb-2" style={{ color: 'hsl(var(--ct-teal))' }}>⚗</div>
+          <img src={logo} alt="Chemtraceit logo" className="h-14 w-auto mb-3" />
           <h1 className="font-serif-display font-bold text-2xl" style={{ color: 'hsl(var(--ct-ink))' }}>Chemtraceit</h1>
           <p className="font-mono-data uppercase text-[0.6rem] tracking-[0.15em] mt-1" style={{ color: 'hsl(var(--ct-muted))' }}>SYNTHESIS INTELLIGENCE</p>
         </div>
