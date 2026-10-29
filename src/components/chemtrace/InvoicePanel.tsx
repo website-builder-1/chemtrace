@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button';
+import logo from '@/assets/logo.png';
 import { useState } from 'react';
 import { BrandLogo } from '@/components/site/BrandLogo';
 import jsPDF from 'jspdf';
@@ -27,7 +29,9 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
     let y = 20;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
-    doc.text('CHEMTRACE — REAGENT INVOICE', 20, y); y += 10;
+    doc.addImage(logo, 'PNG', 20, 14, 9, 8);
+    doc.text('Chemtraceit', 33, y); y += 10;
+    doc.text('Reagent invoice', 20, y); y += 10;
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.text(`Invoice: ${invoice.invoiceNumber}  |  Date: ${invoice.date}`, 20, y); y += 6;
@@ -70,42 +74,20 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
     <section>
       <SectionLabel label="INVOICE & PROCUREMENT" />
       {criticalReagent && (
-        <div className="mb-3 p-3 rounded-[3px] font-body text-sm" style={{ backgroundColor: 'hsl(38,90%,96%)', borderLeft: '3px solid hsl(var(--ct-status-gold))', color: 'hsl(var(--ct-ink))' }}>
+        <div className="mb-3 p-3 rounded-[3px] font-body text-sm" style={{ backgroundColor: 'hsl(var(--ct-review-bg))', borderLeft: '3px solid hsl(var(--ct-status-gold))', color: 'hsl(var(--ct-ink))' }}>
           <span className="font-mono-data uppercase text-[0.6rem] tracking-wider mr-2" style={{ color: 'hsl(var(--ct-status-gold))' }}>⚠ CRITICAL PATH</span>
-          <strong>{criticalReagent.name}</strong> from {criticalReagent.supplier} ({criticalReagent.country}) has the longest lead time at <strong>{criticalReagent.leadDays} days</strong> — this reagent gates the entire synthesis.
+          <strong>{criticalReagent.name}</strong> from {criticalReagent.supplier} ({criticalReagent.country}) has the longest lead time, at <strong>{criticalReagent.leadDays} days</strong>. It sets the start date for the whole synthesis.
         </div>
       )}
       <div className="flex flex-wrap gap-3 mb-3">
-        <button
-          onClick={() => setShowInvoice(!showInvoice)}
-          className="px-4 py-2.5 rounded-[3px] font-mono-data text-xs tracking-wider text-white transition-colors duration-150"
-          style={{ backgroundColor: 'hsl(var(--ct-teal))' }}
-        >
-          {showInvoice ? 'Hide Invoice' : 'View Invoice'}
-        </button>
-        <button
-          onClick={downloadPDF}
-          className="px-4 py-2.5 rounded-[3px] font-mono-data text-xs tracking-wider border transition-colors duration-150"
-          style={{ borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-teal))' }}
-          onMouseEnter={e => { (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-teal))'; (e.target as HTMLElement).style.color = 'white'; }}
-          onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'transparent'; (e.target as HTMLElement).style.color = 'hsl(var(--ct-teal))'; }}
-        >
-          ↓ Download Invoice (PDF)
-        </button>
-        <button
-          onClick={() => downloadReagentsCSV(rec.reagentProcurement, results.molecule.name, currency)}
-          className="px-4 py-2.5 rounded-[3px] font-mono-data text-xs tracking-wider border transition-colors duration-150"
-          style={{ borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-teal))' }}
-          onMouseEnter={e => { (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-teal))'; (e.target as HTMLElement).style.color = 'white'; }}
-          onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'transparent'; (e.target as HTMLElement).style.color = 'hsl(var(--ct-teal))'; }}
-        >
-          ↓ Reagents CSV
-        </button>
+        <Button onClick={() => setShowInvoice(!showInvoice)} className="text-xs">{showInvoice ? 'Hide invoice' : 'View invoice'}</Button>
+        <Button variant="outline" onClick={downloadPDF} className="text-xs">↓ Invoice PDF</Button>
+        <Button variant="outline" onClick={() => downloadReagentsCSV(rec.reagentProcurement, results.molecule.name, currency)} className="text-xs">↓ Reagents CSV</Button>
       </div>
 
       {showInvoice && (
         <div className="bg-card border rounded-[3px] p-5" style={{ borderColor: 'hsl(var(--ct-border))' }}>
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
             <div>
               <BrandLogo size="sm" />
               <div className="font-mono-data text-[0.6rem] uppercase tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>REAGENT INVOICE</div>
@@ -121,11 +103,12 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
             Molecule: {results.molecule.name} | Route: {rec.name} | Batch: {results.batchSizeMg} mg
           </div>
 
-          <table className="w-full border-collapse mb-4">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px] border-collapse mb-4">
             <thead>
               <tr style={{ backgroundColor: 'hsl(var(--ct-sidebar))' }}>
                 {['Reagent', 'CAS', 'Supplier', 'Qty', 'Unit Price', 'Total'].map(h => (
-                  <th key={h} className="font-mono-data uppercase text-[0.6rem] text-white font-medium px-2 py-1.5 text-left">{h}</th>
+                  <th key={h} className="font-mono-data uppercase text-[0.6rem] text-brand-paper font-medium px-2 py-1.5 text-left">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -142,9 +125,10 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
               ))}
             </tbody>
           </table>
+          </div>
 
           <div className="text-right space-y-1">
-            {invoice.incomplete && <p className="font-body text-xs text-muted-foreground">Partial estimate — unpriced items require supplier quotes.</p>}
+            {invoice.incomplete && <p className="font-body text-xs text-muted-foreground">Partial estimate. unpriced items require supplier quotes.</p>}
             <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>Subtotal: {money(invoice.subtotal)}</div>
             <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>VAT (20%): {money(invoice.vat)}</div>
             <div className="font-mono-data text-sm font-bold" style={{ color: 'hsl(var(--ct-teal))' }}>TOTAL: {money(invoice.grandTotal)}</div>
