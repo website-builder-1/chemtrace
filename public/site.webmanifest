@@ -1,0 +1,13 @@
+{
+  "name": "Chemtraceit",
+  "short_name": "Chemtraceit",
+  "description": "Compare synthesis routes by chemistry, cost, supply and risk.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F6F4EE",
+  "theme_color": "#1C1F22",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/logo-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
