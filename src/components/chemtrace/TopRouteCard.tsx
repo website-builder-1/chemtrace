@@ -7,7 +7,7 @@ import { fmt, type Currency } from '@/lib/currency';
 import { computeGreenMetrics, ratingColor } from '@/lib/greenChem';
 import { searchLiterature, buildQuery, type Citation } from '@/lib/literature';
 import SectionLabel from './SectionLabel';
-import { materialsForStep, useSupplierCatalog, priceLabel } from '@/lib/stepMaterials';
+import { materialsForStep, useSupplierCatalog, priceLabel, catalogPrice } from '@/lib/stepMaterials';
 
 const statusStyle = (s: string) => {
   if (s === 'APPROVED') return { color: 'hsl(var(--ct-status-green))', icon: '✓' };
@@ -208,7 +208,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                                   <span className="text-[0.65rem]">{o.product_name}</span>
                                   <span className="font-mono-data text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>{o.cas && `CAS ${o.cas} · `}{o.pack_size}</span>
                                   <span className="font-mono-data text-[0.65rem]" style={{ color: 'hsl(var(--ct-teal))' }} title={o.price_note}>
-                                    {o.price != null ? `${o.currency} ${o.price}` : 'Quote on request'}
+                                    {catalogPrice(o, currency)}
                                   </span>
                                   <span className="font-mono-data text-[0.55rem]" style={{ color: 'hsl(var(--ct-muted))' }}>{priceLabel(o)}</span>
                                 </li>
@@ -218,7 +218,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-1 font-body italic text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>Prices update live when changed — confirm on the supplier's site before ordering.</p>
+                    <p className="mt-1 font-body italic text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>Prices update when changed. Currency conversions use indicative reference rates, not live exchange rates — confirm on the supplier's site before ordering.</p>
                   </div>
                 )}
               </div>

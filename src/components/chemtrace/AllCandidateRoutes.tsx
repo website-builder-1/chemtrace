@@ -3,6 +3,7 @@ import type { SynthesisRoute } from '@/types/chemtrace';
 import SectionLabel from './SectionLabel';
 import { ChevronRight } from 'lucide-react';
 import { useSupplierCatalog, enrichReagent } from '@/lib/stepMaterials';
+import { fmt, formatReagentPrice, type Currency } from '@/lib/currency';
 
 const statusColor = (s: string) => {
   if (s === 'APPROVED') return 'hsl(var(--ct-status-green))';
@@ -16,7 +17,7 @@ const riskColor = (r: string) => {
   return 'hsl(var(--ct-status-red))';
 };
 
-export default function AllCandidateRoutes({ routes, location }: { routes: SynthesisRoute[]; location: string }) {
+export default function AllCandidateRoutes({ routes, location, currency }: { routes: SynthesisRoute[]; location: string; currency: Currency }) {
   const [open, setOpen] = useState<string | null>(null);
   const catalog = useSupplierCatalog();
 
@@ -33,7 +34,7 @@ export default function AllCandidateRoutes({ routes, location }: { routes: Synth
                 className="w-full flex items-center justify-between px-4 py-2.5 text-left"
               >
                 <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>
-                  {route.id} — {route.name} | <span style={{ color: statusColor(route.status) }}>{route.status}</span> | Score {route.score} | Yield {route.yieldPercent}% | £{route.costPerGram}/g
+                  {route.id} — {route.name} | <span style={{ color: statusColor(route.status) }}>{route.status}</span> | Score {route.score} | Yield {route.yieldPercent}% | {fmt(route.costPerGram, currency)}/g
                 </span>
                 <ChevronRight
                   size={14}
@@ -85,7 +86,7 @@ export default function AllCandidateRoutes({ routes, location }: { routes: Synth
                             <tr key={r.name + i} style={{ backgroundColor: i % 2 === 0 ? 'hsl(var(--ct-paper2))' : 'hsl(var(--card))', borderBottom: '1px solid hsl(var(--ct-border))' }}>
                               <td className="font-body px-2 py-1">{r.name}</td>
                               <td className="font-body px-2 py-1">{r.supplier} ({r.country})</td>
-                              <td className="font-mono-data px-2 py-1">{r.price}</td>
+                              <td className="font-mono-data px-2 py-1">{formatReagentPrice(r, currency)}</td>
                               <td className="font-body px-2 py-1">{r.availability}</td>
                               <td className="font-mono-data px-2 py-1 text-center">{r.leadDays}</td>
                               <td className="font-mono-data uppercase text-[0.55rem] px-2 py-1">{r.status}</td>

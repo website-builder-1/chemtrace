@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { ReactionConditions, RouteStep } from '@/types/chemtrace';
 import { buildSupplierUrl } from './supplierLinks';
+import { convertCurrency, isCurrency, formatCurrency, type Currency } from './currency';
 
 export interface CatalogProduct {
   id: string; supplier: string; material_key: string; aliases: string[]; product_name: string; smiles: string | null;
@@ -49,7 +50,14 @@ function match(name: string, cat: CatalogProduct[]): CatalogProduct[] {
     a === n || (a.length > 2 && n.includes(a)) || words.includes(a)));
 }
 
-const best = (offers: CatalogProduct[]) => offers.sort((a, b) => (a.price ?? 1e9) - (b.price ?? 1e9)).slice(0, 3);
+const best = (offers: CatalogProduct[]) => offers.sort((a, b) => {
+  const base = (o: CatalogProduct) => o.price != null && isCurrency(o.currency) ? convertCurrency(o.price, o.currency, 'GBP') : Infinity;
+  return base(a) - base(b);
+}).slice(0, 3);
+
+export function catalogPrice(o: CatalogProduct, currency: Currency): string {
+  return o.price != null ? formatCurrency(o.price, o.currency, currency) : 'Quote on request';
+}
 
 /** Reactants of a step (from its reaction SMILES) that are bought in, not made in an earlier step. */
 function startingMaterials(step: RouteStep, earlierProducts: Set<string>, cat: CatalogProduct[]): StepMaterial[] {
@@ -96,11 +104,12 @@ export function priceLabel(o: CatalogProduct): string {
 }
 
 /** Replace a placeholder procurement row with the cheapest live catalog offer (by SMILES or name). */
-export function enrichReagent<T extends { name: string; cas: string; supplier: string; country: string; price: string; availability: string; productUrl?: string }>(r: T, cat: CatalogProduct[]): T {
+export function enrichReagent<T extends { name: string; cas: string; supplier: string; country: string; price: string; availability: string; productUrl?: string; unitPrice?: number; priceCurrency?: Currency }>(r: T, cat: CatalogProduct[]): T {
   const offers = cat.filter(p => p.smiles === r.name);
   const o = best(offers.length ? offers : match(r.name, cat))[0];
-  if (!o) return { ...r, supplier: 'Not in catalogue', country: '—', price: 'Search suppliers', availability: 'Unconfirmed', productUrl: buildSupplierUrl('Sigma-Aldrich', '', r.name) };
+  if (!o) return { ...r, unitPrice: undefined, priceCurrency: undefined, supplier: 'Not in catalogue', country: '—', price: 'Search suppliers', availability: 'Unconfirmed', productUrl: buildSupplierUrl('Sigma-Aldrich', '', r.name) };
   return { ...r, name: o.smiles === r.name ? o.material_key : r.name, cas: o.cas ?? r.cas, supplier: o.supplier, country: o.country || '—',
     price: o.price != null ? `${o.currency} ${o.price} / ${o.pack_size}` : `Quote on request (${o.pack_size})`,
+    unitPrice: o.price ?? undefined, priceCurrency: isCurrency(o.currency) ? o.currency : undefined,
     availability: priceLabel(o), productUrl: o.product_url };
 }

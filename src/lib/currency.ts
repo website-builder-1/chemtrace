@@ -15,7 +15,37 @@ const SYMBOL: Record<Currency, string> = {
 };
 
 export function convertFromGBP(gbp: number, to: Currency): number {
-  return +(gbp * RATES[to]).toFixed(2);
+  return convertCurrency(gbp, 'GBP', to);
+}
+
+export function isCurrency(value: string): value is Currency {
+  return value === 'GBP' || value === 'USD' || value === 'EUR';
+}
+
+/** Convert from the original currency, never from a previously displayed amount. */
+export function convertCurrency(amount: number, from: Currency, to: Currency): number {
+  return +(amount / RATES[from] * RATES[to]).toFixed(2);
+}
+
+export function formatCurrency(amount: number, from: string, to: Currency): string {
+  if (!isCurrency(from)) return `${from} ${amount.toFixed(2)} (conversion unavailable)`;
+  return `${SYMBOL[to]}${convertCurrency(amount, from, to).toFixed(2)}`;
+}
+
+/** Structured catalogue prices take precedence; unknown prices stay unknown. */
+export function reagentPriceGBP(r: { unitPrice?: number; priceCurrency?: Currency; price: string }): number | null {
+  if (r.unitPrice != null && r.priceCurrency) return convertCurrency(r.unitPrice, r.priceCurrency, 'GBP');
+  const match = r.price.match(/(GBP|USD|EUR|£|\$|€)\s*([\d,]+(?:\.\d+)?)/);
+  if (!match) return null;
+  const from = ({ '£': 'GBP', '$': 'USD', '€': 'EUR' } as Record<string, Currency>)[match[1]] ?? match[1];
+  return isCurrency(from) ? convertCurrency(Number(match[2].replace(/,/g, '')), from, 'GBP') : null;
+}
+
+export function formatReagentPrice(r: { unitPrice?: number; priceCurrency?: Currency; price: string }, to: Currency): string {
+  const gbp = reagentPriceGBP(r);
+  if (gbp == null) return r.price;
+  const suffix = r.price.includes('/') ? ` / ${r.price.split('/').slice(1).join('/').trim()}` : '';
+  return `${fmt(gbp, to)}${suffix}`;
 }
 
 export function fmt(gbp: number, currency: Currency, opts: { decimals?: number } = {}): string {

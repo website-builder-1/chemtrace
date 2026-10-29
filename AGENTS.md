@@ -11,3 +11,4 @@
 - Platform is invite-only: sign-ups disabled; /app and /research wrapped in `RequireAuth` (role client/moderator/admin + first-sign-in setup done); tool edge functions check `_shared/access.ts` — confidential client platform.
 - First sign-in: `profiles.must_change_password` → `admin-users` `change_own_password`; terms signed via `complete_onboarding` RPC against `TERMS_VERSION` in `src/content/terms.ts` (bump to force re-sign).
 - Moderators may manage client accounts only; enforced in `admin-users`.
+- Keep route cost data in GBP and supplier prices in their original currency; all price views and exports use the shared currency helpers and the tool's selected currency to prevent double conversion.
