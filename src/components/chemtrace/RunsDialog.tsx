@@ -74,8 +74,8 @@ export default function RunsDialog({ open, onClose, onLoadRun }: Props) {
       >
         <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: 'hsl(var(--ct-border))' }}>
           <div>
-            <div className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-ink))' }}>Saved Runs</div>
-            <div className="font-mono-data uppercase text-[0.6rem] tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>YOUR CHEMTRACE HISTORY</div>
+            <div className="font-serif-display font-normal text-base" style={{ color: 'hsl(var(--ct-ink))' }}>Saved runs</div>
+            <div className="font-mono-data uppercase text-[0.6rem] tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>YOUR CHEMTRACEIT HISTORY</div>
           </div>
           <button onClick={onClose} aria-label="Close" style={{ minWidth: '44px', minHeight: '44px' }} className="flex items-center justify-center">
             <X className="w-5 h-5" style={{ color: 'hsl(var(--ct-muted))' }} />
@@ -93,7 +93,7 @@ export default function RunsDialog({ open, onClose, onLoadRun }: Props) {
             <div className="text-center py-12">
               <img src={logoMark} alt="" className="h-10 w-auto mx-auto mb-2 opacity-40" />
               <p className="font-body text-sm" style={{ color: 'hsl(var(--ct-muted))' }}>
-                No saved runs yet. Run a pipeline and click <strong>Save Run</strong> to keep it here.
+                No saved runs yet. Run a pipeline and click <strong>Save run</strong> to keep it here.
               </p>
             </div>
           )}
@@ -109,12 +109,12 @@ export default function RunsDialog({ open, onClose, onLoadRun }: Props) {
                     onClick={() => handleLoad(run)}
                     className="flex-1 text-left"
                   >
-                    <div className="font-serif-display font-bold text-sm" style={{ color: 'hsl(var(--ct-teal))' }}>{run.molecule_name}</div>
+                    <div className="font-serif-display font-normal text-sm" style={{ color: 'hsl(var(--ct-teal))' }}>{run.molecule_name}</div>
                     <div className="font-mono-data text-[0.7rem] mt-0.5" style={{ color: 'hsl(var(--ct-muted))' }}>
                       {run.location} · {run.batch_size_mg} mg · {run.recommended_route_name}
                     </div>
                     <div className="font-mono-data text-[0.65rem] mt-0.5" style={{ color: 'hsl(var(--ct-muted))' }}>
-                      Saved {new Date(run.created_at).toLocaleString()}
+                      Saved {new Date(run.created_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </button>
                   <button

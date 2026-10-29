@@ -17,7 +17,7 @@ export default function ControlledSubstanceDialog({ result, query, onClose, onAc
   const isBlock = result.action === 'block';
   const Icon = isBlock ? ShieldAlert : AlertTriangle;
   const accent = isBlock ? 'hsl(var(--ct-status-red))' : 'hsl(var(--ct-status-gold))';
-  const accentBg = isBlock ? 'hsl(0,90%,96%)' : 'hsl(38,90%,96%)';
+  const accentBg = isBlock ? 'hsl(var(--ct-blocked-bg))' : 'hsl(var(--ct-review-bg))';
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(20,24,28,0.6)' }}>
@@ -26,7 +26,7 @@ export default function ControlledSubstanceDialog({ result, query, onClose, onAc
           <div className="flex items-start gap-3">
             <Icon className="w-6 h-6 flex-shrink-0 mt-0.5" style={{ color: accent }} />
             <div>
-              <h2 className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-ink))' }}>
+              <h2 className="font-serif-display font-normal text-base" style={{ color: 'hsl(var(--ct-ink))' }}>
                 {isBlock ? 'Synthesis planning refused' : 'Heightened-disclaimer review'}
               </h2>
               <p className="font-mono-data uppercase text-[0.6rem] tracking-wider mt-0.5" style={{ color: accent }}>
@@ -54,7 +54,7 @@ export default function ControlledSubstanceDialog({ result, query, onClose, onAc
 
           {isBlock ? (
             <p className="font-body italic text-xs leading-relaxed" style={{ color: 'hsl(var(--ct-muted))' }}>
-              Chemtraceit will not return synthesis routes, reagent lists, or procurement intelligence for this substance. If you are an accredited researcher with a legitimate need, work through your institution's controlled-substances officer and authorised supplier channels — not this tool.
+              Chemtraceit will not return synthesis routes, reagent lists, or procurement intelligence for this substance. If you are an accredited researcher with a legitimate need, work through your institution's controlled-substances officer and authorised supplier channels, not this tool.
             </p>
           ) : (
             <p className="font-body italic text-xs leading-relaxed" style={{ color: 'hsl(var(--ct-muted))' }}>
@@ -74,10 +74,10 @@ export default function ControlledSubstanceDialog({ result, query, onClose, onAc
           {!isBlock && onAcknowledge && (
             <button
               onClick={onAcknowledge}
-              className="px-4 py-2 rounded-[3px] font-mono-data text-xs uppercase tracking-wider text-white"
+              className="px-4 py-2 rounded-[3px] font-mono-data text-xs uppercase tracking-wider text-brand-paper"
               style={{ backgroundColor: accent, minHeight: 36 }}
             >
-              I acknowledge — proceed
+              I acknowledge. Proceed
             </button>
           )}
         </div>

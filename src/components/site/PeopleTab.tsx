@@ -139,9 +139,9 @@ function PersonRow({ p, titles, act, isAdmin }: { p: Person; titles: Title[]; ac
             {p.is_main && tag('Main admin', 'hsl(var(--ct-teal))')}
             {p.disabled && tag('Disabled', 'hsl(var(--ct-status-red))')}
           </div>
-          <div className="font-mono-data text-xs break-all" style={muted}>{p.email}{p.company ? ` · ${p.company}` : ''} · last sign-in {p.last_sign_in_at ? new Date(p.last_sign_in_at).toLocaleDateString() : 'never'}</div>
+          <div className="font-mono-data text-xs break-all" style={muted}>{p.email}{p.company ? ` · ${p.company}` : ''} · last sign-in {p.last_sign_in_at ? new Date(p.last_sign_in_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'never'}</div>
           <div className="font-mono-data text-[0.65rem] mt-1" style={muted}>
-            {p.must_change_password ? 'Awaiting first sign-in setup' : p.terms_signed_at ? `Terms v${p.terms_version} signed by "${p.terms_signed_name}" on ${new Date(p.terms_signed_at).toLocaleString()}` : 'Terms not yet signed'}
+            {p.must_change_password ? 'Awaiting first sign-in setup' : p.terms_signed_at ? `Terms v${p.terms_version} signed by "${p.terms_signed_name}" on ${new Date(p.terms_signed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}` : 'Terms not yet signed'}
           </div>
         </div>
         {canManage ? (

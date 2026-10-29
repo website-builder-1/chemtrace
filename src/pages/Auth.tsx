@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { BrandHero } from '@/components/site/BrandLogo';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -36,7 +37,7 @@ export default function Auth() {
         <div className="bg-card border rounded-[3px] p-5 sm:p-6" style={{ borderColor: 'hsl(var(--ct-border))' }}>
           <h2 className="font-serif-display text-lg mb-1" style={{ color: 'hsl(var(--ct-ink))' }}>Sign in</h2>
           <p className="font-body text-sm mb-4" style={{ color: 'hsl(var(--ct-muted))' }}>
-            Chemtraceit is invite-only. Accounts are issued by Chemtraceit — contact <a href="mailto:admin@chemtraceit.com" className="underline" style={{ color: 'hsl(var(--ct-teal))' }}>admin@chemtraceit.com</a> for access.
+            Chemtraceit is invite-only. Accounts are issued by Chemtraceit. Contact <a href="mailto:admin@chemtraceit.com" className="underline" style={{ color: 'hsl(var(--ct-teal))' }}>admin@chemtraceit.com</a> for access.
           </p>
           {noAccess && <p className="font-body text-sm mb-4" style={{ color: 'hsl(var(--ct-status-red))' }}>Your account doesn't have platform access yet. Please contact admin@chemtraceit.com.</p>}
 
@@ -53,13 +54,11 @@ export default function Auth() {
                 className="w-full px-3 rounded-[3px] font-body text-base border focus:outline-none focus:ring-1 focus:ring-[hsl(var(--ct-teal))]"
                 style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-ink))', minHeight: '44px' }} />
             </div>
-            <button type="submit" disabled={loading}
-              className="w-full px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] uppercase transition-colors duration-150 disabled:opacity-50"
-              style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))', minHeight: '44px' }}>
+            <Button type="submit" disabled={loading} className="w-full min-h-11 text-xs">
               {loading ? 'Please wait…' : 'Sign in →'}
-            </button>
+            </Button>
           </form>
-          <Link to="/" className="block text-center w-full mt-3 px-4 py-2 font-mono-data text-[0.7rem] uppercase tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>← Back to home</Link>
+          <Link to="/" className="block text-center w-full mt-3 px-4 py-2 font-mono-data text-[0.7rem]" style={{ color: 'hsl(var(--ct-muted))' }}>← Back to home</Link>
         </div>
 
         <p className="font-body text-xs text-center mt-4" style={{ color: 'hsl(var(--ct-muted))' }}>Use of Chemtraceit is subject to the Terms of Use and Confidentiality Agreement.</p>
