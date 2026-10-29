@@ -76,7 +76,7 @@ function TermsStep({ onDone }: { onDone: () => void }) {
   const [agree, setAgree] = useState(false);
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
-  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const onScroll = () => {
     const el = boxRef.current; if (!el) return;
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 24) setReadAll(true);
@@ -88,7 +88,7 @@ function TermsStep({ onDone }: { onDone: () => void }) {
     const { error } = await supabase.rpc('complete_onboarding', { _signed_name: name.trim().slice(0, 120), _version: TERMS_VERSION, _user_agent: navigator.userAgent });
     setBusy(false);
     if (error) return toast.error(error.message);
-    toast.success('Thank you — agreement signed.');
+    toast.success('Thank you. Agreement signed.');
     onDone();
   };
   return (
@@ -99,11 +99,11 @@ function TermsStep({ onDone }: { onDone: () => void }) {
         <p>{TERMS_INTRO}</p>
         {TERMS_SECTIONS.map(s => (
           <section key={s.heading}>
-            <h3 className="font-serif-display font-bold text-base mb-1">{s.heading}</h3>
+            <h3 className="font-serif-display font-normal text-base mb-1">{s.heading}</h3>
             {s.body.map((b, i) => <p key={i} className="mb-1.5">{b}</p>)}
           </section>
         ))}
-        <p className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>— End of agreement —</p>
+        <p className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>End of agreement</p>
       </div>
       {!readAll && <p className="font-body text-xs mt-2" style={{ color: 'hsl(var(--ct-muted))' }}>Scroll to the end of the agreement to sign.</p>}
 
@@ -116,7 +116,7 @@ function TermsStep({ onDone }: { onDone: () => void }) {
             <input type="checkbox" className="mt-1" checked={agree} onChange={e => setAgree(e.target.checked)} /> I have read, understood and agree to the Terms of Use and Confidentiality Agreement.
           </label>
           <div className="grid gap-3 sm:grid-cols-[1fr_auto] items-end">
-            <div><label htmlFor="sig" className={label} style={{ color: 'hsl(var(--ct-muted))' }}>Signature — type your full legal name</label>
+            <div><label htmlFor="sig" className={label} style={{ color: 'hsl(var(--ct-muted))' }}>Signature: type your full legal name</label>
               <input id="sig" className={`${input} font-serif-display italic`} style={inputStyle} maxLength={120} value={name} onChange={e => setName(e.target.value)} placeholder="Full name" /></div>
             <div><div className={label} style={{ color: 'hsl(var(--ct-muted))' }}>Date</div>
               <div className="px-3 flex items-center font-mono-data text-sm border rounded-[3px]" style={inputStyle}>{today}</div></div>

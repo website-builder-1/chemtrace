@@ -112,7 +112,7 @@ export function adaptEngineRoutes(
         ? `Verified route from established literature (${r.steps.map(s => s.conditions?.source).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join('; ')}).`
         : analogous
           ? `Standard reaction template applied by RDKit (${r.steps.map(s => s.conditions?.source).filter(Boolean)[0] ?? 'textbook'}). Conditions are typical, not reported for this exact molecule.`
-          : `Proposed by ChemTraceIt's Chemistry Artificial Intelligence Engine — verify against literature before scale-up.`,
+          : `Proposed by Chemtraceit AI. Verify against literature before scale-up.`,
       supplyRisk: 'low' as RiskLevel,
       regulatoryRisk: 'low' as RiskLevel,
       decisionReason: r.decisionReason,
@@ -127,7 +127,7 @@ export function adaptEngineRoutes(
       ] : [
         {
           type: 'warning',
-          text: `Route proposed by ChemTraceIt's Chemistry Artificial Intelligence Engine for ${location} production. Reaction conditions are predictions, not experimentally verified. Cross-check key steps against primary literature.`,
+          text: `Route proposed by Chemtraceit AI for ${location} production. Reaction conditions are predictions, not experimentally verified. Cross-check key steps against primary literature.`,
         },
       ],
     };

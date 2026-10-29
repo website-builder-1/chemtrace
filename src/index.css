@@ -4,46 +4,55 @@
 
 @layer base {
   :root {
-    --background: 40 33% 95%;
-    --foreground: 210 10% 12%;
+    --background: 45.000 30.769% 94.902%;
+    --foreground: 210.000 9.677% 12.157%;
     --card: 0 0% 100%;
-    --card-foreground: 210 10% 12%;
+    --card-foreground: 210.000 9.677% 12.157%;
     --popover: 0 0% 100%;
-    --popover-foreground: 210 10% 12%;
-    --primary: 180 34% 26%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 37 28% 91%;
-    --secondary-foreground: 210 10% 12%;
-    --muted: 37 18% 72%;
-    --muted-foreground: 30 5% 30%;
-    --accent: 37 28% 91%;
-    --accent-foreground: 210 10% 12%;
-    --destructive: 0 50% 30%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 35 20% 72%;
-    --input: 210 12% 17%;
-    --ring: 180 34% 26%;
+    --popover-foreground: 210.000 9.677% 12.157%;
+    --primary: 180.000 33.835% 26.078%;
+    --primary-foreground: 45.000 30.769% 94.902%;
+    --secondary: 40.000 26.087% 90.980%;
+    --secondary-foreground: 210.000 9.677% 12.157%;
+    --muted: 40.000 26.087% 90.980%;
+    --muted-foreground: 34.286 4.575% 30.000%;
+    --accent: 40.000 26.087% 90.980%;
+    --accent-foreground: 210.000 9.677% 12.157%;
+    --destructive: 0.000 25.490% 30.000%;
+    --destructive-foreground: 45.000 30.769% 94.902%;
+    --border: 35.172 20.280% 71.961%;
+    --input: 35.172 20.280% 71.961%;
+    --ring: 162.472 37.872% 53.922%;
     --radius: 3px;
+    --ct-logo-paper: 45.000 30.769% 94.902%;
+    --ct-review-bg: 39.429 57.377% 88.039%;
+    --ct-blocked-bg: 0.000 42.857% 90.392%;
+    --ct-sidebar-rule: 210.000 9.804% 20.000%;
+    --ct-arrive-duration: 320ms;
+    --ct-arrive-ease: cubic-bezier(.16, 1, .3, 1);
+    --ct-move-duration: 200ms;
+    --ct-move-ease: cubic-bezier(.65, 0, .35, 1);
+    --ct-control-duration: 160ms;
 
-    --ct-ink: 210 10% 12%;
-    --ct-muted: 30 5% 30%;
-    --ct-teal: 180 34% 26%;
-    --ct-teal-hover: 180 30% 35%;
-    --ct-paper: 40 33% 95%;
-    --ct-paper2: 37 28% 91%;
-    --ct-sidebar: 210 10% 12%;
-    --ct-sidebar-input: 212 14% 17%;
-    --ct-sidebar-text: 205 17% 82%;
-    --ct-sidebar-label: 200 12% 66%;
-    --ct-border: 35 20% 72%;
-    --ct-agent-dark: 180 40% 16%;
-    --ct-agent-pulse: 162 38% 54%;
-    --ct-status-green: 149 35% 21%;
-    --ct-status-gold: 38 55% 23%;
-    --ct-status-red: 0 38% 30%;
+    --ct-ink: 210.000 9.677% 12.157%;
+    --ct-muted: 34.286 4.575% 30.000%;
+    --ct-teal: 180.000 33.835% 26.078%;
+    --ct-teal-hover: 180.000 30.337% 34.902%;
+    --ct-paper: 45.000 30.769% 94.902%;
+    --ct-paper2: 40.000 26.087% 90.980%;
+    --ct-sidebar: 210.000 9.677% 12.157%;
+    --ct-sidebar-input: 210.000 13.953% 16.863%;
+    --ct-sidebar-text: 206.250 17.391% 81.961%;
+    --ct-sidebar-label: 200.000 12.139% 66.078%;
+    --ct-border: 35.172 20.280% 71.961%;
+    --ct-agent-dark: 180.000 40.741% 15.882%;
+    --ct-agent-pulse: 162.472 37.872% 53.922%;
+    --ct-status-green: 149.189 34.579% 20.980%;
+    --ct-status-gold: 37.846 55.556% 22.941%;
+    --ct-status-red: 0.000 25.490% 30.000%;
     --ct-amber: 30 48% 39%;
-    --ct-green-bg: 134 35% 85%;
-    --ct-green-border: 134 30% 65%;
+    --ct-green-bg: 138.000 35.714% 89.020%;
+    --ct-green-border: 136.923 24.841% 69.216%;
   }
 }
 
@@ -53,7 +62,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -65,6 +76,7 @@
 
 .font-mono-data {
   font-family: 'IBM Plex Mono', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .font-body {
@@ -86,4 +98,22 @@
 
 .animate-ct-spin {
   animation: ct-spin 1s linear infinite;
+}
+
+/* The PNG remains the master. The mask removes the white molecule so it
+   takes the colour of the solid background rather than a painted white fill. */
+.ct-brand-mark {
+  background-color: currentColor;
+  mask: url('./assets/logo-mask.png') center / contain no-repeat;
+  -webkit-mask: url('./assets/logo-mask.png') center / contain no-repeat;
+}
+
+.font-serif-display:not(.font-bold) { font-weight: 400; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

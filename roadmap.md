@@ -1,5 +1,6 @@
 # Chemtraceit roadmap — Chemical Intelligence Engine
 
+- [x] CHE-20: applied shared palette, logo placement, heading weights, motion accessibility, product copy and British dates; saved full reference and future-update rules; public pages/navigation verified and five currency regression tests passed. Signed-in page verification unavailable because the requesting user's email has no matching app account.
 - [x] CHE-16: consistent selected currency across route prices, supplier offers, invoices and exports; five regression tests passed and signed-in ethanol switching/download verified
 
 - [x] Stage 0 — Architecture report in Files

@@ -117,8 +117,8 @@ function SuppliersTab() {
   useEffect(() => { load(); }, []);
   const save = async (r: Sp) => {
     const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from('supplier_products').update({ product_name: r.product_name, pack_size: r.pack_size, price: r.price, currency: r.currency, product_url: r.product_url, price_source: 'manual', manual_override: true, updated_by: u.user?.id ?? null, price_note: 'Checked by ChemTraceIt staff', updated_at: new Date().toISOString() }).eq('id', r.id);
-    if (error) toast.error(error.message); else { toast.success('Saved — clients see the new price now.'); load(); }
+    const { error } = await supabase.from('supplier_products').update({ product_name: r.product_name, pack_size: r.pack_size, price: r.price, currency: r.currency, product_url: r.product_url, price_source: 'manual', manual_override: true, updated_by: u.user?.id ?? null, price_note: 'Checked by Chemtraceit staff', updated_at: new Date().toISOString() }).eq('id', r.id);
+    if (error) toast.error(error.message); else { toast.success('Saved. Clients see the new price now.'); load(); }
   };
   const checkNow = async () => {
     setChecking(true);
@@ -147,7 +147,7 @@ function SuppliersTab() {
               <td className="p-1 w-24"><input className={inputCls} style={inputStyle} type="number" step="0.01" value={r.price ?? ''} onChange={e => upd(r.id, { price: e.target.value === '' ? null : Number(e.target.value) })} /></td>
               <td className="p-1 w-20"><select className={inputCls} style={inputStyle} value={r.currency} onChange={e => upd(r.id, { currency: e.target.value })}><option>USD</option><option>GBP</option><option>EUR</option></select></td>
               <td className="p-1"><input className={inputCls} style={inputStyle} value={r.product_url} onChange={e => upd(r.id, { product_url: e.target.value })} /></td>
-              <td className="p-2 font-mono-data text-[0.6rem]" style={muted}>{r.price_source === 'manual' ? 'Staff' : r.price_source === 'auto' ? 'Live' : 'Estimate'} · {new Date(r.updated_at).toLocaleDateString()}{r.auto_status ? <div>Auto: {r.auto_status}</div> : null}</td>
+              <td className="p-2 font-mono-data text-[0.6rem]" style={muted}>{r.price_source === 'manual' ? 'Staff' : r.price_source === 'auto' ? 'Live' : 'Estimate'} · {new Date(r.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}{r.auto_status ? <div>Auto: {r.auto_status}</div> : null}</td>
               <td className="p-1"><Btn onClick={() => save(r)}>Save</Btn></td>
             </tr>))}</tbody>
         </table>

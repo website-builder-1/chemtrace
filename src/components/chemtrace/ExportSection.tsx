@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import type { PipelineResults } from '@/types/chemtrace';
 import { downloadRoutesCSV, downloadCROBrief, downloadJSON } from '@/lib/exportUtils';
@@ -5,30 +6,24 @@ import SectionLabel from './SectionLabel';
 import type { Currency } from '@/lib/currency';
 import { useSupplierCatalog, enrichReagent } from '@/lib/stepMaterials';
 
-const btnClass = "px-4 py-2.5 rounded-[3px] font-mono-data text-xs tracking-wider border transition-colors duration-150";
-
 export default function ExportSection({ results, currency }: { results: PipelineResults; currency: Currency }) {
   const [elnMsg, setElnMsg] = useState('');
   const catalog = useSupplierCatalog();
   const exportResults = { ...results, routes: results.routes.map(r => ({ ...r, reagentProcurement: r.reagentProcurement.map(p => enrichReagent(p, catalog)) })) };
 
-  const btnStyle = { borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-teal))' };
-  const hover = (e: React.MouseEvent) => { (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-teal))'; (e.target as HTMLElement).style.color = 'white'; };
-  const leave = (e: React.MouseEvent) => { (e.target as HTMLElement).style.backgroundColor = 'transparent'; (e.target as HTMLElement).style.color = 'hsl(var(--ct-teal))'; };
-
   return (
     <section>
       <SectionLabel label="EXPORT" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadRoutesCSV(exportResults, currency)}>↓ Routes CSV</button>
-        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadCROBrief(exportResults, currency)}>↓ CRO Brief</button>
-        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadJSON(exportResults, currency)}>↓ JSON Data</button>
-        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => setElnMsg('ELN push requires server-side Benchling API configuration. Contact your system administrator.')}>
-          Push to ELN (Benchling)
-        </button>
+        <Button variant="outline" className="h-auto min-h-10 whitespace-normal text-xs" onClick={() => downloadRoutesCSV(exportResults, currency)}>↓ Routes CSV</Button>
+        <Button variant="outline" className="h-auto min-h-10 whitespace-normal text-xs" onClick={() => downloadCROBrief(exportResults, currency)}>↓ CRO brief</Button>
+        <Button variant="outline" className="h-auto min-h-10 whitespace-normal text-xs" onClick={() => downloadJSON(exportResults, currency)}>↓ JSON data</Button>
+        <Button variant="outline" className="h-auto min-h-10 whitespace-normal text-xs" onClick={() => setElnMsg('Sending to Benchling is not available yet. Ask your administrator to connect Benchling.')}>
+          Send to Benchling
+        </Button>
       </div>
       {elnMsg && (
-        <div className="mt-2 p-3 rounded-[3px] font-body text-sm" style={{ backgroundColor: 'hsl(210,90%,96%)', borderLeft: '3px solid hsl(var(--ct-teal))', color: 'hsl(var(--ct-ink))' }}>
+        <div className="mt-2 p-3 rounded-[3px] font-body text-sm" style={{ backgroundColor: 'hsl(var(--ct-paper2))', borderLeft: '3px solid hsl(var(--ct-teal))', color: 'hsl(var(--ct-ink))' }}>
           {elnMsg}
         </div>
       )}

@@ -34,7 +34,7 @@ export default function AllCandidateRoutes({ routes, location, currency }: { rou
                 className="w-full flex items-center justify-between px-4 py-2.5 text-left"
               >
                 <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>
-                  {route.id} — {route.name} | <span style={{ color: statusColor(route.status) }}>{route.status}</span> | Score {route.score} | Yield {route.yieldPercent}% | {fmt(route.costPerGram, currency)}/g
+                  {route.id} · {route.name} · <span style={{ color: statusColor(route.status) }}>{route.status.charAt(0) + route.status.slice(1).toLowerCase()}</span> · Score {route.score} · Yield {route.yieldPercent}% · {fmt(route.costPerGram, currency)}/g
                 </span>
                 <ChevronRight
                   size={14}
@@ -49,13 +49,13 @@ export default function AllCandidateRoutes({ routes, location, currency }: { rou
                     {/* Left: steps + citation + risk */}
                     <div>
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="font-serif-display font-bold text-sm" style={{ color: 'hsl(var(--ct-ink))' }}>{route.name}</span>
+                        <span className="font-serif-display font-normal text-sm" style={{ color: 'hsl(var(--ct-ink))' }}>{route.name}</span>
                         <span className="font-mono-data uppercase text-[0.58rem]" style={{ color: statusColor(route.status) }}>{route.status}</span>
                       </div>
                       <div className="space-y-1.5 mb-3">
                         {route.steps.map(step => (
                           <div key={step.number} className="flex items-start gap-2">
-                            <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-mono-data text-[0.6rem] text-white" style={{ backgroundColor: 'hsl(var(--ct-teal))' }}>{step.number}</span>
+                            <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-mono-data text-[0.6rem] text-brand-paper" style={{ backgroundColor: 'hsl(var(--ct-teal))' }}>{step.number}</span>
                             <span className="font-body text-xs leading-relaxed" style={{ color: 'hsl(var(--ct-ink))' }}>{step.description}</span>
                           </div>
                         ))}
@@ -77,7 +77,7 @@ export default function AllCandidateRoutes({ routes, location, currency }: { rou
                         <thead>
                           <tr style={{ backgroundColor: 'hsl(var(--ct-sidebar))' }}>
                             {['Reagent', `Supplier (Country)`, 'Price', 'Availability', 'Lead', `Status (${location})`].map(h => (
-                              <th key={h} className="font-mono-data uppercase text-[0.58rem] text-white font-medium px-2 py-1 text-left whitespace-nowrap">{h}</th>
+                              <th key={h} className="font-mono-data uppercase text-[0.58rem] text-brand-paper font-medium px-2 py-1 text-left whitespace-nowrap">{h}</th>
                             ))}
                           </tr>
                         </thead>
@@ -99,7 +99,7 @@ export default function AllCandidateRoutes({ routes, location, currency }: { rou
 
                   {/* Risk notes */}
                   {route.riskNotes?.map((note, i) => {
-                    const bg = note.type === 'error' ? 'hsl(0,90%,96%)' : note.type === 'warning' ? 'hsl(38,90%,96%)' : 'hsl(210,90%,96%)';
+                    const bg = note.type === 'error' ? 'hsl(var(--ct-blocked-bg))' : note.type === 'warning' ? 'hsl(var(--ct-review-bg))' : 'hsl(var(--ct-paper2))';
                     const border = note.type === 'error' ? 'hsl(var(--ct-status-red))' : note.type === 'warning' ? 'hsl(var(--ct-status-gold))' : 'hsl(var(--ct-teal))';
                     return (
                       <div key={i} className="mt-2 p-2 rounded-[3px] font-body text-xs" style={{ backgroundColor: bg, borderLeft: `3px solid ${border}`, color: 'hsl(var(--ct-ink))' }}>

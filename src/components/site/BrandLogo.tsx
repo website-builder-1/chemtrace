@@ -1,15 +1,12 @@
-import logo from '@/assets/logo.png';
-import logoLight from '@/assets/logo-light.png';
-
 /** The one Chemtraceit logo lockup. `tone="light"` for dark backgrounds. */
 export function BrandLogo({ tone = 'dark', size = 'md', showName = true }: { tone?: 'dark' | 'light'; size?: 'sm' | 'md'; showName?: boolean }) {
-  const img = size === 'sm' ? 'h-6' : 'h-8';
+  const img = size === 'sm' ? 'h-6 w-[27px]' : 'h-8 w-9';
   const text = size === 'sm' ? 'text-lg' : 'text-xl';
   return (
-    <span className="inline-flex items-center gap-2.5">
-      <img src={tone === 'light' ? logoLight : logo} alt={showName ? '' : 'Chemtraceit'} className={`${img} w-auto shrink-0`} />
+    <span className={`inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap ${showName ? 'min-w-[120px]' : ''} ${tone === 'light' ? 'text-brand-paper' : 'text-foreground'}`}>
+      <span role={showName ? undefined : 'img'} aria-label={showName ? undefined : 'Chemtraceit'} aria-hidden={showName ? true : undefined} className={`ct-brand-mark ${img} shrink-0`} />
       {showName && (
-        <span className={`font-serif-display font-bold ${text} leading-none`} style={{ color: tone === 'light' ? 'hsl(var(--ct-paper))' : 'hsl(var(--ct-ink))' }}>
+        <span className={`font-serif-display font-bold ${text} leading-none`}>
           Chemtraceit
         </span>
       )}
@@ -20,14 +17,13 @@ export function BrandLogo({ tone = 'dark', size = 'md', showName = true }: { ton
 /** Centered hero lockup for the sign-in and account-setup pages. */
 export function BrandHero({ subtitle }: { subtitle: string }) {
   return (
-    <div className="flex flex-col items-center text-center mb-8">
-      <div className="w-20 h-20 rounded-full flex items-center justify-center border shadow-sm mb-4"
-        style={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--ct-border))' }}>
-        <img src={logo} alt="Chemtraceit logo" className="h-11 w-auto" />
+    <div className="flex flex-col items-center text-center mb-8 text-foreground">
+      <div className="p-7">
+        <span className="ct-brand-mark block h-14 w-[62px]" aria-hidden="true" />
       </div>
-      <h1 className="font-serif-display font-bold text-3xl" style={{ color: 'hsl(var(--ct-ink))' }}>Chemtraceit</h1>
-      <div className="w-10 h-px my-3" style={{ backgroundColor: 'hsl(var(--ct-teal))' }} />
-      <p className="font-mono-data uppercase text-[0.6rem] tracking-[0.2em]" style={{ color: 'hsl(var(--ct-muted))' }}>{subtitle}</p>
+      <h1 className="font-serif-display font-bold text-3xl">Chemtraceit</h1>
+      <div className="w-10 h-px my-3 bg-primary" />
+      <p className="font-mono-data text-xs text-muted-foreground">{subtitle}</p>
     </div>
   );
 }

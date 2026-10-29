@@ -9,8 +9,8 @@ const statusChip = (s: string) => {
   const map: Record<string, { bg: string; text: string; icon: string }> = {
     PREFERRED: { bg: 'hsl(var(--ct-green-bg))', text: 'hsl(var(--ct-status-green))', icon: '✓' },
     STANDARD: { bg: 'hsl(var(--ct-paper2))', text: 'hsl(var(--ct-ink))', icon: '–' },
-    RESTRICTED: { bg: 'hsl(38,80%,92%)', text: 'hsl(var(--ct-status-gold))', icon: '△' },
-    BLOCKED: { bg: 'hsl(0,70%,94%)', text: 'hsl(var(--ct-status-red))', icon: '✕' },
+    RESTRICTED: { bg: 'hsl(var(--ct-review-bg))', text: 'hsl(var(--ct-status-gold))', icon: '△' },
+    BLOCKED: { bg: 'hsl(var(--ct-blocked-bg))', text: 'hsl(var(--ct-status-red))', icon: '✕' },
   };
   return map[s] || map.STANDARD;
 };
@@ -64,7 +64,7 @@ export default function SupplyChainSection({ results, currency }: { results: Pip
           <thead>
             <tr style={{ backgroundColor: 'hsl(var(--ct-sidebar))' }}>
               {['Reagent', 'CAS', 'Supplier', 'Country', 'Price', 'Availability', 'Lead (days)', 'Hazard', 'Geo Risk', `Status (${location})`, 'Export Ctrl'].map(h => (
-                <th key={h} className="font-mono-data uppercase text-[0.63rem] text-white font-medium px-2 py-1.5 text-left whitespace-nowrap">{h}</th>
+                <th key={h} className="font-mono-data uppercase text-[0.63rem] text-brand-paper font-medium px-2 py-1.5 text-left whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
@@ -79,7 +79,7 @@ export default function SupplyChainSection({ results, currency }: { results: Pip
                     backgroundColor: i % 2 === 0 ? 'hsl(var(--ct-paper2))' : 'hsl(var(--card))',
                     borderBottom: '1px solid hsl(var(--ct-border))',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E8E0D0')}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'hsl(var(--ct-paper2))')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = i % 2 === 0 ? 'hsl(var(--ct-paper2))' : 'hsl(var(--card))')}
                 >
                   <td className="font-body text-[0.79rem] px-2 py-1.5" style={{ color: 'hsl(var(--ct-ink))' }}>{r.name}</td>
@@ -113,10 +113,10 @@ export default function SupplyChainSection({ results, currency }: { results: Pip
                   <td className="font-mono-data text-[0.72rem] px-2 py-1.5 text-center">{r.leadDays}</td>
                   <td className="font-body text-[0.72rem] px-2 py-1.5">{r.hazard}</td>
                   <td className="font-mono-data text-[0.72rem] px-2 py-1.5">
-                    <span style={{ color: riskDot(r.geoRisk) }}>●</span> {r.geoRisk}
+                    <span style={{ color: riskDot(r.geoRisk) }}>●</span> {r.geoRisk.charAt(0).toUpperCase() + r.geoRisk.slice(1)}
                   </td>
                   <td className="px-2 py-1.5">
-                    <span className="font-mono-data uppercase text-[0.58rem] px-1.5 py-0.5 rounded-[1px]" style={{ backgroundColor: chip.bg, color: chip.text }}>{chip.icon} {r.status}</span>
+                    <span className="font-mono-data text-[0.58rem] px-1.5 py-0.5 rounded-[1px]" style={{ backgroundColor: chip.bg, color: chip.text }}>{chip.icon} {r.status.charAt(0) + r.status.slice(1).toLowerCase()}</span>
                   </td>
                   <td className="font-mono-data text-[0.72rem] px-2 py-1.5" style={{ color: r.exportControlled ? 'hsl(var(--ct-status-gold))' : 'hsl(var(--ct-muted))' }}>
                     {r.exportControlled ? '⚠ Yes' : '—'}
@@ -129,7 +129,7 @@ export default function SupplyChainSection({ results, currency }: { results: Pip
       </div>
 
       <p className="font-body italic text-[0.7rem] mt-3" style={{ color: 'hsl(var(--ct-muted))' }}>
-        Supplier, country and price come live from the ChemTraceIt supplier catalogue (cheapest listed offer) and update as soon as staff or the daily check change them. Links open the supplier's product page — confirm live pricing, pack size, lead time, and shipping restrictions before placing an order.
+        Supplier, country and price show the cheapest listed offer in the Chemtraceit supplier catalogue. Estimates, staff checks and supplier checks are labelled with their dates. Confirm pricing, pack size, lead time and shipping restrictions on the supplier's product page before ordering.
       </p>
     </section>
   );

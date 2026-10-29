@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect, useRef } from 'react';
 import type { PipelineResults, ChatMessage } from '@/types/chemtrace';
@@ -134,18 +135,18 @@ export default function AIAgentPanel({ results, currency }: Props) {
 
   return (
     <section id="chemtrace-ai-panel">
-      <SectionLabel label="CHEMTRACE AI AGENT" />
+      <SectionLabel label="Chemtraceit AI" />
 
       {/* Header bar */}
       <div className="rounded-t-[3px] px-4 py-2.5 flex items-center gap-2" style={{ backgroundColor: 'hsl(var(--ct-agent-dark))' }}>
         <span className="inline-block w-2 h-2 rounded-full animate-ct-pulse" style={{ backgroundColor: 'hsl(var(--ct-agent-pulse))' }} />
-        <span className="font-mono-data uppercase text-[0.63rem] tracking-wider text-white">CHEMTRACE AI · EXPERT CHEMISTRY ASSISTANT</span>
+        <span className="font-mono-data uppercase text-[0.63rem] tracking-wider text-brand-paper">Chemtraceit AI · Chemistry assistant</span>
       </div>
 
       {/* Subheader */}
       <div className="border-x border-b px-4 py-2" style={{ borderColor: 'hsl(var(--ct-border))' }}>
         <p className="font-body text-sm" style={{ color: 'hsl(var(--ct-muted))' }}>
-          Ask me anything about this synthesis — mechanisms, reagents, safety, procurement, or alternatives.
+          Ask about mechanisms, reagents, safety, procurement or alternatives for this route.
         </p>
       </div>
 
@@ -170,7 +171,7 @@ export default function AIAgentPanel({ results, currency }: Props) {
             }}
           >
             <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-muted))' }}>
-              {msg.role === 'agent' ? 'CHEMTRACE AI' : 'YOU'}
+              {msg.role === 'agent' ? 'Chemtraceit AI' : 'YOU'}
             </div>
             <div className="font-body text-sm leading-relaxed prose prose-sm max-w-none" style={{ color: 'hsl(var(--ct-ink))' }}>
               <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -194,20 +195,10 @@ export default function AIAgentPanel({ results, currency }: Props) {
           <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-2" style={{ color: 'hsl(var(--ct-muted))' }}>SUGGESTED QUESTIONS</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {SUGGESTED_QUESTIONS.map(q => (
-              <button
-                key={q}
-                onClick={() => sendMessage(q)}
-                className="text-left px-3 py-2 border rounded-[2px] font-body text-xs transition-colors duration-150"
-                style={{
-                  backgroundColor: 'hsl(var(--ct-paper2))',
-                  borderColor: 'hsl(var(--ct-border))',
-                  color: 'hsl(var(--ct-agent-dark))',
-                }}
-                onMouseEnter={e => { (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-teal))'; (e.target as HTMLElement).style.color = 'white'; }}
-                onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-paper2))'; (e.target as HTMLElement).style.color = 'hsl(var(--ct-agent-dark))'; }}
-              >
+              <Button key={q} variant="secondary" onClick={() => sendMessage(q)}
+                className="h-auto min-h-10 whitespace-normal justify-start text-left text-xs font-body border border-border">
                 {q}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -225,16 +216,9 @@ export default function AIAgentPanel({ results, currency }: Props) {
           rows={2}
           disabled={isLoading}
         />
-        <button
-          onClick={() => sendMessage(input)}
-          disabled={isLoading || !input.trim()}
-          className="mt-2 px-4 py-1.5 rounded-[3px] font-mono-data text-xs tracking-wider text-white transition-colors duration-150 disabled:opacity-40"
-          style={{ backgroundColor: 'hsl(var(--ct-teal))' }}
-          onMouseEnter={e => { if (!(e.target as HTMLButtonElement).disabled) (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-teal-hover))'; }}
-          onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-teal))'; }}
-        >
+        <Button onClick={() => sendMessage(input)} disabled={isLoading || !input.trim()} className="mt-2 text-xs">
           Send →
-        </button>
+        </Button>
       </div>
     </section>
   );
