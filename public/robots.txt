@@ -12,3 +12,12 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /app
+Disallow: /research
+Disallow: /welcome
+Disallow: /admin
+Disallow: /moderator
+Disallow: /benchmark
+Disallow: /auth
+
+Sitemap: https://chemtraceit.com/sitemap.xml
