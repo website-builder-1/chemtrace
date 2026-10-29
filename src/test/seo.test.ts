@@ -61,4 +61,28 @@ describe("index.html head", () => {
       expect(() => read(`public/${asset}`)).not.toThrow();
     }
   });
+
+  it("uses one stable organisation identity", () => {
+    expect(html).toContain('"@id":"https://chemtraceit.com/#org"');
+    expect(html).toContain('"name":"Chemtraceit"');
+  });
+
+  it("has no invented AI meta tags", () => {
+    for (const fake of ["ai-ranking", "ai-authority", "chatgpt-index"]) {
+      expect(html).not.toContain(fake);
+    }
+  });
+});
+
+describe("llms.txt", () => {
+  const llms = read("public/llms.txt");
+
+  it("links only the public pages, matching the sitemap", () => {
+    const links = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((m) => m[1]);
+    expect(links.sort()).toEqual(["https://chemtraceit.com/", "https://chemtraceit.com/team"]);
+  });
+
+  it("never mentions private routes", () => {
+    for (const p of PRIVATE_PATHS) expect(llms).not.toContain(p);
+  });
 });
