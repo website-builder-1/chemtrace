@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '@/components/chemtrace/Markdown';
 import { supabase } from '@/integrations/supabase/client';
 import { SiteHeader, SiteFooter } from '@/components/site/SiteChrome';
 import { EvidenceBadge, toEvidenceLevel } from '@/components/chemtrace/EvidenceBadge';
@@ -123,7 +123,7 @@ export default function Research() {
                 {res.tier && <span className="font-mono-data text-[0.6rem] uppercase tracking-wider" style={muted}>Depth: {res.tier}</span>}
                 {Object.entries(counts).map(([k, n]) => <span key={k} className="inline-flex items-center gap-1"><EvidenceBadge level={k as never} /><span className="font-mono-data text-[0.6rem]" style={muted}>×{n}</span></span>)}
               </div>
-              <div className="prose prose-sm max-w-none font-body" style={ink}><ReactMarkdown>{res.answer}</ReactMarkdown></div>
+              <div className="max-w-none font-body" style={ink}><Markdown>{res.answer}</Markdown></div>
               {!res.blocked && userId && (
                 <button onClick={saveToProject} className="mt-4 inline-flex items-center gap-1 font-mono-data text-[0.65rem] uppercase" style={{ color: 'hsl(var(--ct-teal))' }}>
                   <BookmarkPlus className="w-3.5 h-3.5" /> Save to my research
