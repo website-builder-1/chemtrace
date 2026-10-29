@@ -1,5 +1,6 @@
 # Chemtraceit roadmap — Chemical Intelligence Engine
 
+- [ ] CHE-20: apply uploaded brand guidelines to shared styling, logo placement and product copy; preserve reference for future updates and verify pages
 - [x] CHE-16: consistent selected currency across route prices, supplier offers, invoices and exports; five regression tests passed and signed-in ethanol switching/download verified
 
 - [x] Stage 0 — Architecture report in Files
