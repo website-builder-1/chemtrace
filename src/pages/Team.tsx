@@ -12,23 +12,35 @@ const team = [
 export default function Team() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
-      <PageMeta title="Our Team — Chemtraceit" description="Meet the chemists and engineers behind Chemtraceit, the synthesis route planning, reagent sourcing and supply-risk platform." path="/team" />
+      <PageMeta
+        title="Our Team | Chemtraceit Synthesis Route Intelligence"
+        description="Meet the chemists and engineers behind Chemtraceit, the platform for synthesis route planning, reagent sourcing and supply risk. Get in touch today."
+        keywords="Chemtraceit team, synthesis route planning, chemistry software, reagent sourcing, chemical supply chain"
+        path="/team"
+        jsonLd={[
+          { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'Chemtraceit team', url: 'https://chemtraceit.com/team' },
+          { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://chemtraceit.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Team', item: 'https://chemtraceit.com/team' },
+          ] },
+        ]}
+      />
       <SiteHeader />
       <main className="flex-1 max-w-6xl mx-auto px-5 py-16 w-full">
         <div className="font-mono-data text-xs uppercase tracking-[0.2em]" style={{ color: 'hsl(var(--ct-teal))' }}>The people</div>
         <h1 className="font-serif-display text-4xl mt-3" style={{ color: 'hsl(var(--ct-ink))' }}>Meet the team</h1>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10">
           {team.map(m => (
-            <div key={m.name} className="bg-card border rounded-[3px] overflow-hidden" style={{ borderColor: 'hsl(var(--ct-border))' }}>
-              <div className="aspect-square flex items-center justify-center font-serif-display text-5xl" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-teal))' }}>
+            <article key={m.name} className="bg-card border rounded-[3px] overflow-hidden" style={{ borderColor: 'hsl(var(--ct-border))' }}>
+              <div aria-hidden="true" className="aspect-square flex items-center justify-center font-serif-display text-5xl" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-teal))' }}>
                 {m.name[0]}
               </div>
               <div className="p-5">
-                <div className="font-serif-display text-xl" style={{ color: 'hsl(var(--ct-ink))' }}>{m.name}</div>
+                <h2 className="font-serif-display text-xl" style={{ color: 'hsl(var(--ct-ink))' }}>{m.name}</h2>
                 <div className="font-mono-data text-xs uppercase tracking-wider mt-1" style={{ color: 'hsl(var(--ct-teal))' }}>{m.role}</div>
                 <p className="font-body text-sm mt-3" style={{ color: 'hsl(var(--ct-muted))' }}>{m.bio}</p>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </main>

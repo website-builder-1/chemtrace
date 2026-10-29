@@ -13,3 +13,4 @@
 - Moderators may manage client accounts only; enforced in `admin-users`.
 - Keep route cost data in GBP and supplier prices in their original currency; all price views and exports use the shared currency helpers and the tool's selected currency to prevent double conversion.
 - Brand styling is centralised in global CSS tokens and shared BrandLogo/BrandHero components; read `docs/brand-guidelines.html` for future design changes, keeping the original PNG master and using its derived cutout mask so logo details match each background.
+- Every page sets head tags via `PageMeta` (react-helmet-async); private routes get noindex in `App.tsx`, and new public routes must be added to `scripts/generate-sitemap.ts` — keeps search indexing limited to public pages.

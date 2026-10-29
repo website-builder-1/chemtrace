@@ -1,8 +1,22 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /app
+Disallow: /research
+Disallow: /welcome
+Disallow: /admin
+Disallow: /moderator
+Disallow: /benchmark
+Disallow: /auth
 
 User-agent: Bingbot
 Allow: /
+Disallow: /app
+Disallow: /research
+Disallow: /welcome
+Disallow: /admin
+Disallow: /moderator
+Disallow: /benchmark
+Disallow: /auth
 
 User-agent: Twitterbot
 Allow: /

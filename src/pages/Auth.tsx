@@ -32,7 +32,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
       <div className="w-full max-w-md">
-        <BrandHero subtitle="Synthesis intelligence" />
+        <BrandHero heading="Client sign in" subtitle="Synthesis intelligence" />
 
         <div className="bg-card border rounded-[3px] p-5 sm:p-6" style={{ borderColor: 'hsl(var(--ct-border))' }}>
           <h2 className="font-serif-display text-lg mb-1" style={{ color: 'hsl(var(--ct-ink))' }}>Sign in</h2>

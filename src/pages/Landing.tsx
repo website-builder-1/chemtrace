@@ -33,7 +33,22 @@ const compare: [string, boolean, boolean][] = [
 export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
-      <PageMeta title="Chemtraceit — Synthesis Route Planning & Sourcing" description="Compare synthesis routes by chemistry, cost, supply and risk. Route planning, reagent sourcing and geopolitical risk checks in one platform." path="/" />
+      <PageMeta
+        title="Synthesis Route Planning & Reagent Sourcing | Chemtraceit"
+        description="Compare synthesis routes by chemistry, cost, supply and geopolitical risk. Plan routes, source reagents and price them in one place. Request access today."
+        keywords="synthesis route planning, retrosynthesis, reagent sourcing, chemical procurement, supply chain risk, chemistry software"
+        path="/"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'SoftwareApplication',
+          name: 'Chemtraceit',
+          applicationCategory: 'BusinessApplication',
+          operatingSystem: 'Web',
+          url: 'https://chemtraceit.com/',
+          description: 'Synthesis route planning, reagent sourcing and geopolitical risk checks for chemistry teams.',
+          publisher: { '@type': 'Organization', name: 'Chemtraceit', url: 'https://chemtraceit.com/' },
+        }}
+      />
       <SiteHeader />
       <main className="flex-1">
         <section className="max-w-6xl mx-auto px-5 pt-16 pb-14 md:pt-24">
@@ -63,8 +78,8 @@ export default function Landing() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
               {features.map(f => (
                 <div key={f.title} className="bg-card border rounded-[3px] p-5" style={{ borderColor: 'hsl(var(--ct-border))' }}>
-                  <f.icon className="w-5 h-5" style={{ color: 'hsl(var(--ct-teal))' }} />
-                  <div className="font-mono-data text-sm uppercase tracking-wider mt-3" style={{ color: 'hsl(var(--ct-ink))' }}>{f.title}</div>
+                  <f.icon aria-hidden="true" className="w-5 h-5" style={{ color: 'hsl(var(--ct-teal))' }} />
+                  <h3 className="font-mono-data text-sm uppercase tracking-wider mt-3" style={{ color: 'hsl(var(--ct-ink))' }}>{f.title}</h3>
                   <p className="font-body text-sm mt-2" style={{ color: 'hsl(var(--ct-muted))' }}>{f.text}</p>
                 </div>
               ))}
@@ -78,7 +93,7 @@ export default function Landing() {
             {steps.map(([n, t, d]) => (
               <div key={n} className="border-t-2 pt-4" style={{ borderColor: 'hsl(var(--ct-teal))' }}>
                 <div className="font-mono-data text-2xl" style={{ color: 'hsl(var(--ct-teal))' }}>{n}</div>
-                <div className="font-serif-display text-xl mt-2" style={{ color: 'hsl(var(--ct-ink))' }}>{t}</div>
+                <h3 className="font-serif-display text-xl mt-2" style={{ color: 'hsl(var(--ct-ink))' }}>{t}</h3>
                 <p className="font-body text-sm mt-2" style={{ color: 'hsl(var(--ct-muted))' }}>{d}</p>
               </div>
             ))}
