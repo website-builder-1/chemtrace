@@ -11,13 +11,13 @@ const questions = [
 const features = [
   { icon: Route, title: 'Route planning', text: 'AI retrosynthesis proposes ranked routes with predicted conditions for any valid structure.' },
   { icon: PackageSearch, title: 'Reagent sourcing', text: 'Starting materials mapped to suppliers, lead times and geographic supply risk.' },
-  { icon: ShieldCheck, title: 'Risk & compliance', text: 'Controlled-substance screening, regulatory framework and hazard notes per route.' },
+  { icon: ShieldCheck, title: 'Geopolitical risk & compliance', text: 'A unique geopolitical trade matrix with scoring that includes controlled-substance screening, regulatory framework and hazard notes per route.' },
   { icon: Receipt, title: 'Costed invoice', text: 'Batch-scaled cost estimates and exportable procurement invoices in GBP, USD or EUR.' },
 ];
 
 const steps = [
   ['01', 'Enter a molecule', 'Type a name or paste a SMILES string, set batch size and production location.'],
-  ['02', 'Compare routes', 'Review ranked pathways, conditions, green-chemistry metrics and literature.'],
+  ['02', 'Compare routes', 'Review ranked pathways, conditions, chemistry metrics and literature.'],
   ['03', 'Procure with confidence', 'Check supply and compliance risk, then export the reagent invoice.'],
 ];
 
@@ -37,20 +37,19 @@ export default function Landing() {
         <section className="max-w-6xl mx-auto px-5 pt-16 pb-14 md:pt-24">
           <div className="font-mono-data text-xs uppercase tracking-[0.2em]" style={{ color: 'hsl(var(--ct-teal))' }}>Synthesis intelligence</div>
           <h1 className="font-serif-display text-4xl md:text-6xl leading-tight mt-4 max-w-3xl" style={{ color: 'hsl(var(--ct-ink))' }}>
-            From novel compound to costed, compliant synthesis plan.
+            Compare synthesis routes by chemistry, cost, supply, and risk.
           </h1>
           <p className="font-body text-lg mt-5 max-w-2xl" style={{ color: 'hsl(var(--ct-muted))' }}>
-            Chemtraceit combines route planning, reagent sourcing and risk checks, so chemists can move from idea to bench faster.
+            Chemtraceit combines route planning, reagent sourcing and geopolitical risk checks, so chemists can move from idea to bench faster.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/app" className="font-mono-data text-sm px-6 py-3 rounded-[3px]" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>Try Chemtraceit →</Link>
             <a href="#how" className="font-mono-data text-sm px-6 py-3 rounded-[3px] border" style={{ borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-teal))' }}>How it works</a>
           </div>
           <div className="grid md:grid-cols-3 gap-4 mt-14">
-            {questions.map((q, i) => (
+            {questions.map(q => (
               <div key={q} className="bg-card border rounded-[3px] p-5" style={{ borderColor: 'hsl(var(--ct-border))' }}>
-                <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-teal))' }}>Q{i + 1}</div>
-                <div className="font-serif-display text-lg mt-2" style={{ color: 'hsl(var(--ct-ink))' }}>“{q}”</div>
+                <div className="font-serif-display text-lg" style={{ color: 'hsl(var(--ct-ink))' }}>“{q}”</div>
               </div>
             ))}
           </div>
