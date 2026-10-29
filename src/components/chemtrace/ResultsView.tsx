@@ -12,7 +12,8 @@ import ExportSection from './ExportSection';
 const HR = () => <hr className="my-5" style={{ borderColor: 'hsl(var(--ct-border))' }} />;
 
 export default function ResultsView({ results, currency }: { results: PipelineResults; currency: Currency }) {
-  const rec = results.routes.find(r => r.id === results.recommendedRouteId)!;
+  const rec = results.routes.find(r => r.id === results.recommendedRouteId);
+  if (!rec) return null;
 
   return (
     <div className="space-y-0">
@@ -20,17 +21,17 @@ export default function ResultsView({ results, currency }: { results: PipelineRe
       <HR />
       <TopRouteCard route={rec} molecule={results.molecule} currency={currency} />
       <HR />
-      <SupplyChainSection results={results} />
+      <SupplyChainSection results={results} currency={currency} />
       <HR />
       <InvoicePanel results={results} currency={currency} />
       <HR />
-      <AllCandidateRoutes routes={results.routes} location={results.location} />
+      <AllCandidateRoutes routes={results.routes} location={results.location} currency={currency} />
       <HR />
       <ProtocolGenerator results={results} />
       <HR />
-      <ExportSection results={results} />
+      <ExportSection results={results} currency={currency} />
       <HR />
-      <AIAgentPanel results={results} />
+      <AIAgentPanel results={results} currency={currency} />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import SectionLabel from './SectionLabel';
 import { ExternalLink } from 'lucide-react';
 import { buildSupplierUrl } from '@/lib/supplierLinks';
 import { useSupplierCatalog, enrichReagent } from '@/lib/stepMaterials';
+import { formatReagentPrice, type Currency } from '@/lib/currency';
 
 const statusChip = (s: string) => {
   const map: Record<string, { bg: string; text: string; icon: string }> = {
@@ -20,10 +21,11 @@ const riskDot = (r: string) => {
   return 'hsl(var(--ct-status-red))';
 };
 
-export default function SupplyChainSection({ results }: { results: PipelineResults }) {
+export default function SupplyChainSection({ results, currency }: { results: PipelineResults; currency: Currency }) {
   const { regulatory, location } = results;
-  const rec = results.routes.find(r => r.id === results.recommendedRouteId)!;
+  const rec = results.routes.find(r => r.id === results.recommendedRouteId);
   const catalog = useSupplierCatalog();
+  if (!rec) return null;
   const reagents = rec.reagentProcurement.map(r => enrichReagent(r, catalog));
 
   return (
@@ -104,7 +106,7 @@ export default function SupplyChainSection({ results }: { results: PipelineResul
                       style={{ color: 'hsl(var(--ct-ink))' }}
                       title="Verify live price on supplier site"
                     >
-                      {r.price}
+                      {formatReagentPrice(r, currency)}
                     </a>
                   </td>
                   <td className="font-body text-[0.79rem] px-2 py-1.5">{r.availability}</td>

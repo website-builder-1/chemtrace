@@ -3,14 +3,19 @@ import { BrandLogo } from '@/components/site/BrandLogo';
 import jsPDF from 'jspdf';
 import type { PipelineResults } from '@/types/chemtrace';
 import { generateInvoiceData, downloadReagentsCSV } from '@/lib/exportUtils';
-import { fmt, symbol, convertFromGBP, type Currency } from '@/lib/currency';
+import { formatCurrency, symbol, type Currency } from '@/lib/currency';
+import { useSupplierCatalog, enrichReagent } from '@/lib/stepMaterials';
 import SectionLabel from './SectionLabel';
 
 export default function InvoicePanel({ results, currency }: { results: PipelineResults; currency: Currency }) {
-  const rec = results.routes.find(r => r.id === results.recommendedRouteId)!;
-  const invoice = generateInvoiceData(rec, results.batchSizeMg);
+  const catalog = useSupplierCatalog();
+  const recommended = results.routes.find(r => r.id === results.recommendedRouteId);
   const [showInvoice, setShowInvoice] = useState(false);
+  if (!recommended) return null;
+  const rec = { ...recommended, reagentProcurement: recommended.reagentProcurement.map(r => enrichReagent(r, catalog)) };
+  const invoice = generateInvoiceData(rec, results.batchSizeMg, currency);
   const sym = symbol(currency);
+  const money = (amount: number | null) => amount == null ? 'Quote required' : formatCurrency(amount, currency, currency);
 
   // Identify critical-path reagent (longest lead time)
   const criticalReagent = rec.reagentProcurement.length > 0
@@ -44,18 +49,19 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
       doc.text(item.cas, cols[1], y);
       doc.text(item.supplier.slice(0, 15), cols[2], y);
       doc.text(String(item.qty), cols[3], y);
-      doc.text(`${sym}${convertFromGBP(item.unitPrice, currency).toFixed(2)}`, cols[4], y);
-      doc.text(`${sym}${convertFromGBP(item.total, currency).toFixed(2)}`, cols[5], y);
+      doc.text(money(item.unitPrice), cols[4], y);
+      doc.text(money(item.total), cols[5], y);
       y += 5;
     });
 
     y += 3;
     doc.line(20, y, 190, y); y += 6;
     doc.setFont('helvetica', 'bold');
-    doc.text(`Subtotal: ${sym}${convertFromGBP(invoice.subtotal, currency).toFixed(2)}`, 150, y); y += 5;
-    doc.text(`VAT (20%): ${sym}${convertFromGBP(invoice.vat, currency).toFixed(2)}`, 150, y); y += 5;
+    if (invoice.incomplete) { doc.text('Partial estimate: unpriced items require supplier quotes.', 20, y); y += 6; }
+    doc.text(`Subtotal: ${money(invoice.subtotal)}`, 150, y); y += 5;
+    doc.text(`VAT (20%): ${money(invoice.vat)}`, 150, y); y += 5;
     doc.setFontSize(10);
-    doc.text(`TOTAL: ${sym}${convertFromGBP(invoice.grandTotal, currency).toFixed(2)}`, 150, y);
+    doc.text(`TOTAL: ${money(invoice.grandTotal)}`, 150, y);
 
     doc.save(`chemtrace_invoice_${invoice.invoiceNumber}.pdf`);
   };
@@ -87,7 +93,7 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
           ↓ Download Invoice (PDF)
         </button>
         <button
-          onClick={() => downloadReagentsCSV(rec.reagentProcurement, results.molecule.name)}
+          onClick={() => downloadReagentsCSV(rec.reagentProcurement, results.molecule.name, currency)}
           className="px-4 py-2.5 rounded-[3px] font-mono-data text-xs tracking-wider border transition-colors duration-150"
           style={{ borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-teal))' }}
           onMouseEnter={e => { (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-teal))'; (e.target as HTMLElement).style.color = 'white'; }}
@@ -130,17 +136,18 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
                   <td className="font-mono-data text-[0.7rem] px-2 py-1.5">{item.cas}</td>
                   <td className="font-body text-xs px-2 py-1.5">{item.supplier}</td>
                   <td className="font-mono-data text-xs px-2 py-1.5 text-center">{item.qty}</td>
-                  <td className="font-mono-data text-xs px-2 py-1.5">{fmt(item.unitPrice, currency)}</td>
-                  <td className="font-mono-data text-xs px-2 py-1.5 font-medium">{fmt(item.total, currency)}</td>
+                  <td className="font-mono-data text-xs px-2 py-1.5">{money(item.unitPrice)}</td>
+                  <td className="font-mono-data text-xs px-2 py-1.5 font-medium">{money(item.total)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
 
           <div className="text-right space-y-1">
-            <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>Subtotal: {fmt(invoice.subtotal, currency)}</div>
-            <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>VAT (20%): {fmt(invoice.vat, currency)}</div>
-            <div className="font-mono-data text-sm font-bold" style={{ color: 'hsl(var(--ct-teal))' }}>TOTAL: {fmt(invoice.grandTotal, currency)}</div>
+            {invoice.incomplete && <p className="font-body text-xs text-muted-foreground">Partial estimate — unpriced items require supplier quotes.</p>}
+            <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>Subtotal: {money(invoice.subtotal)}</div>
+            <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>VAT (20%): {money(invoice.vat)}</div>
+            <div className="font-mono-data text-sm font-bold" style={{ color: 'hsl(var(--ct-teal))' }}>TOTAL: {money(invoice.grandTotal)}</div>
           </div>
         </div>
       )}

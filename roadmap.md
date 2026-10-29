@@ -1,5 +1,7 @@
 # Chemtraceit roadmap — Chemical Intelligence Engine
 
+- [ ] CHE-16: consistent selected currency across route prices, supplier offers, invoices and exports; regression tests and signed-in verification
+
 - [x] Stage 0 — Architecture report in Files
 - [x] Stage 1 — Model router, compound database, chem-tools (RDKit), caching
 - [x] Stage 2 — Literature ingestion + hybrid search, reaction database, graph edges

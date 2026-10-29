@@ -2,11 +2,15 @@ import { useState } from 'react';
 import type { PipelineResults } from '@/types/chemtrace';
 import { downloadRoutesCSV, downloadCROBrief, downloadJSON } from '@/lib/exportUtils';
 import SectionLabel from './SectionLabel';
+import type { Currency } from '@/lib/currency';
+import { useSupplierCatalog, enrichReagent } from '@/lib/stepMaterials';
 
 const btnClass = "px-4 py-2.5 rounded-[3px] font-mono-data text-xs tracking-wider border transition-colors duration-150";
 
-export default function ExportSection({ results }: { results: PipelineResults }) {
+export default function ExportSection({ results, currency }: { results: PipelineResults; currency: Currency }) {
   const [elnMsg, setElnMsg] = useState('');
+  const catalog = useSupplierCatalog();
+  const exportResults = { ...results, routes: results.routes.map(r => ({ ...r, reagentProcurement: r.reagentProcurement.map(p => enrichReagent(p, catalog)) })) };
 
   const btnStyle = { borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-teal))' };
   const hover = (e: React.MouseEvent) => { (e.target as HTMLElement).style.backgroundColor = 'hsl(var(--ct-teal))'; (e.target as HTMLElement).style.color = 'white'; };
@@ -16,9 +20,9 @@ export default function ExportSection({ results }: { results: PipelineResults })
     <section>
       <SectionLabel label="EXPORT" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadRoutesCSV(results)}>↓ Routes CSV</button>
-        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadCROBrief(results)}>↓ CRO Brief</button>
-        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadJSON(results)}>↓ JSON Data</button>
+        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadRoutesCSV(exportResults, currency)}>↓ Routes CSV</button>
+        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadCROBrief(exportResults, currency)}>↓ CRO Brief</button>
+        <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => downloadJSON(exportResults, currency)}>↓ JSON Data</button>
         <button className={btnClass} style={btnStyle} onMouseEnter={hover} onMouseLeave={leave} onClick={() => setElnMsg('ELN push requires server-side Benchling API configuration. Contact your system administrator.')}>
           Push to ELN (Benchling)
         </button>
