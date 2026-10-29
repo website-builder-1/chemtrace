@@ -60,7 +60,7 @@ function SidebarBody(p: SidebarBodyProps) {
             onChange={e => p.setQuery(e.target.value)}
             placeholder="ibuprofen"
             className={inputClass}
-            style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: '#E2EAF0', minHeight: '44px' }}
+            style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: 'hsl(var(--ct-logo-paper))', minHeight: '44px' }}
             onKeyDown={e => e.key === 'Enter' && p.runPipeline()}
           />
         </div>
@@ -71,7 +71,7 @@ function SidebarBody(p: SidebarBodyProps) {
             value={p.batchSize}
             onChange={e => p.setBatchSize(Number(e.target.value))}
             className={inputClass}
-            style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: '#E2EAF0', minHeight: '44px' }}
+            style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: 'hsl(var(--ct-logo-paper))', minHeight: '44px' }}
           />
         </div>
         <div>
@@ -80,7 +80,7 @@ function SidebarBody(p: SidebarBodyProps) {
             value={p.location}
             onChange={e => p.setLocation(e.target.value)}
             className={inputClass}
-            style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: '#E2EAF0', minHeight: '44px' }}
+            style={{ backgroundColor: 'hsl(var(--ct-sidebar-input))', color: 'hsl(var(--ct-logo-paper))', minHeight: '44px' }}
           >
             {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
           </select>
@@ -95,7 +95,7 @@ function SidebarBody(p: SidebarBodyProps) {
                 className="flex-1 py-1.5 rounded-[2px] font-mono-data text-[0.65rem] uppercase tracking-wider transition-colors"
                 style={{
                   backgroundColor: p.currency === c ? 'hsl(var(--ct-teal))' : 'transparent',
-                  color: p.currency === c ? 'white' : 'hsl(var(--ct-sidebar-label))',
+                  color: p.currency === c ? 'hsl(var(--ct-logo-paper))' : 'hsl(var(--ct-sidebar-label))',
                   minHeight: '36px',
                 }}
               >
@@ -118,7 +118,7 @@ function SidebarBody(p: SidebarBodyProps) {
         <button
           onClick={p.runPipeline}
           disabled={p.isLoading}
-          className="w-full px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] text-white transition-colors duration-150 disabled:opacity-50"
+          className="w-full px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] text-brand-paper transition-colors duration-150 disabled:opacity-50"
           style={{ backgroundColor: 'hsl(var(--ct-teal))', minHeight: '44px' }}
         >
           {p.isLoading ? 'Running…' : 'Run Chemtraceit →'}
@@ -131,7 +131,7 @@ function SidebarBody(p: SidebarBodyProps) {
             className="w-full flex items-center justify-center gap-2 px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] border transition-colors duration-150 disabled:opacity-50"
             style={{ borderColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-sidebar-text))', minHeight: '44px' }}
           >
-            <Save className="w-3.5 h-3.5" /> Save Run
+            <Save className="w-3.5 h-3.5" /> Save run
           </button>
         )}
 
@@ -141,7 +141,7 @@ function SidebarBody(p: SidebarBodyProps) {
             className="w-full flex items-center justify-center gap-2 px-4 rounded-[3px] font-mono-data text-xs tracking-[0.08em] border transition-colors duration-150"
             style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-sidebar-text))', minHeight: '44px' }}
           >
-            <History className="w-3.5 h-3.5" /> My Runs
+            <History className="w-3.5 h-3.5" /> My runs
           </button>
         )}
 
@@ -335,18 +335,18 @@ export default function Index() {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden lg:flex w-[280px] flex-shrink-0 flex-col" style={{ borderRight: '2px solid hsl(var(--ct-teal))' }}>
+      <aside className="hidden lg:flex w-[280px] flex-shrink-0 flex-col" style={{ borderRight: '1px solid hsl(var(--ct-sidebar-rule))' }}>
         <SidebarBody {...sidebarProps} />
       </aside>
 
       <header
         className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3"
-        style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderBottom: '2px solid hsl(var(--ct-teal))' }}
+        style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderBottom: '1px solid hsl(var(--ct-sidebar-rule))' }}
       >
         <BrandLogo tone="light" size="sm" />
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
-            <button aria-label="Open menu" className="flex items-center justify-center rounded-[3px] text-white" style={{ minWidth: '44px', minHeight: '44px' }}>
+            <button aria-label="Open menu" className="flex items-center justify-center rounded-[3px] text-brand-paper" style={{ minWidth: '44px', minHeight: '44px' }}>
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </SheetTrigger>
@@ -358,7 +358,7 @@ export default function Index() {
 
       <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 pt-[72px] lg:pt-6" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
         {error && (
-          <div className="mb-4 p-3 rounded-[3px] font-body text-sm" style={{ backgroundColor: 'hsl(0,90%,96%)', borderLeft: '3px solid hsl(var(--ct-status-red))', color: 'hsl(var(--ct-ink))' }}>
+          <div className="mb-4 p-3 rounded-[3px] font-body text-sm" style={{ backgroundColor: 'hsl(var(--ct-blocked-bg))', borderLeft: '3px solid hsl(var(--ct-status-red))', color: 'hsl(var(--ct-ink))' }}>
             {error}
           </div>
         )}
@@ -366,7 +366,7 @@ export default function Index() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
             <div className="w-8 h-8 border-[3px] rounded-full animate-ct-spin mb-3" style={{ borderColor: 'hsl(var(--ct-teal))', borderTopColor: 'transparent' }} />
-            <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>Scanning using ChemTraceIt's Chemistry Artificial Intelligence Engine…</span>
+            <span className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-muted))' }}>Scanning using Chemtraceit AI…</span>
           </div>
         )}
 
@@ -376,11 +376,11 @@ export default function Index() {
           <div className="flex items-center justify-center h-full min-h-[500px]">
             <div className="max-w-[540px] text-center w-full">
               <div className="flex justify-center mb-4"><img src={logoMark} alt="Chemtraceit" className="h-16 sm:h-20 w-auto" /></div>
-              <h1 className="font-serif-display font-bold text-xl sm:text-2xl mb-3" style={{ color: 'hsl(var(--ct-ink))', lineHeight: 1.2 }}>Autonomous Reaction Scouting</h1>
+              <h1 className="font-serif-display font-normal text-xl sm:text-2xl mb-3" style={{ color: 'hsl(var(--ct-ink))', lineHeight: 1.2 }}>Autonomous Reaction Scouting</h1>
               <p className="font-body text-sm sm:text-base leading-[1.7] mb-5" style={{ color: 'hsl(var(--ct-muted))' }}>
                 Enter a molecule name or SMILES string. Chemtraceit evaluates synthesis routes, checks reagent supply chains, assesses regulatory compliance, and recommends the optimal pathway for your production location and batch size.
               </p>
-                <div className="border rounded-[3px] p-3 mb-4 text-left" style={{ backgroundColor: 'hsl(38,90%,96%)', borderColor: 'hsl(var(--ct-status-gold))' }}>
+                <div className="border rounded-[3px] p-3 mb-4 text-left" style={{ backgroundColor: 'hsl(var(--ct-review-bg))', borderColor: 'hsl(var(--ct-status-gold))' }}>
                   <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-status-gold))' }}>RESPONSIBLE-USE NOTICE</div>
                   <p className="font-body text-[0.78rem] leading-relaxed" style={{ color: 'hsl(var(--ct-ink))' }}>
                     Chemtraceit will not plan syntheses for controlled narcotics, CWC-scheduled chemical weapons agents, or primary high explosives. Scheduled drug precursors and CWC Schedule 2/3 dual-use chemicals require an acknowledgement and remain the user's compliance responsibility under their local laws (UK MDA 1971, US CSA, EU 273/2004, CWC, etc.).

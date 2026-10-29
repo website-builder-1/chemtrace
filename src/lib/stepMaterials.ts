@@ -97,9 +97,9 @@ export function materialsForStep(c: ReactionConditions | undefined, cat: Catalog
 }
 
 export function priceLabel(o: CatalogProduct): string {
-  const when = new Date(o.price_source === 'auto' && o.price_checked_at ? o.price_checked_at : o.updated_at).toLocaleDateString();
+  const when = new Date(o.price_source === 'auto' && o.price_checked_at ? o.price_checked_at : o.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   if (o.price_source === 'auto') return `Live from supplier · ${when}`;
-  if (o.price_source === 'manual') return `Checked by ChemTraceIt staff · ${when}`;
+  if (o.price_source === 'manual') return `Checked by Chemtraceit staff · ${when}`;
   return `Estimated list price · ${when}`;
 }
 

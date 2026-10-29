@@ -23,14 +23,14 @@ export function SiteHeader() {
   const cta = userId ? { to: '/app', label: 'Open tool →' } : { to: '/auth', label: 'Sign in →' };
   const signOut = async () => { await supabase.auth.signOut(); window.location.href = '/'; };
   return (
-    <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-teal))' }}>
+    <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-sidebar-rule))' }}>
       <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-        <Link to="/" aria-label="Chemtraceit home" className="shrink-0"><BrandLogo tone="light" /></Link>
-        <nav className="hidden lg:flex items-center gap-6 font-mono-data text-xs uppercase tracking-wider whitespace-nowrap">
+        <Link to="/" aria-label="Chemtraceit home" className="shrink-0"><span className="block py-4"><BrandLogo tone="light" size="sm" /></span></Link>
+        <nav className="hidden lg:flex items-center gap-6 font-mono-data text-xs whitespace-nowrap">
           {all.map(l => (
             <NavLink key={l.to} to={l.to} className="hover:opacity-80 shrink-0" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</NavLink>
           ))}
-          {userId && <button onClick={signOut} className="hover:opacity-80 uppercase shrink-0" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>Sign out</button>}
+          {userId && <button onClick={signOut} className="hover:opacity-80 shrink-0" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>Sign out</button>}
           <Link to={cta.to} className="px-4 py-2 rounded-[3px] shrink-0" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>{cta.label}</Link>
         </nav>
         <button className="lg:hidden" aria-label="Menu" onClick={() => setOpen(o => !o)} style={{ color: 'hsl(var(--ct-paper))' }}>
@@ -38,11 +38,11 @@ export function SiteHeader() {
         </button>
       </div>
       {open && (
-        <nav className="lg:hidden flex flex-col gap-4 px-5 pb-5 font-mono-data text-sm uppercase tracking-wider">
+        <nav className="lg:hidden flex flex-col gap-4 px-5 pb-5 font-mono-data text-sm">
           {all.map(l => (
             <Link key={l.to} to={l.to} onClick={() => setOpen(false)} style={{ color: 'hsl(var(--ct-sidebar-text))' }}>{l.label}</Link>
           ))}
-          {userId && <button onClick={signOut} className="text-left uppercase" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>Sign out</button>}
+          {userId && <button onClick={signOut} className="text-left" style={{ color: 'hsl(var(--ct-sidebar-text))' }}>Sign out</button>}
           <Link to={cta.to} onClick={() => setOpen(false)} className="px-4 py-2 rounded-[3px] text-center" style={{ backgroundColor: 'hsl(var(--ct-teal))', color: 'hsl(var(--ct-paper))' }}>{cta.label}</Link>
         </nav>
       )}
@@ -52,7 +52,7 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer id="contact" className="border-t" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-teal))' }}>
+    <footer id="contact" className="border-t" style={{ backgroundColor: 'hsl(var(--ct-sidebar))', borderColor: 'hsl(var(--ct-sidebar-rule))' }}>
       <div className="max-w-6xl mx-auto px-5 py-10 grid gap-6 md:grid-cols-3">
         <div>
           <BrandLogo tone="light" size="sm" />

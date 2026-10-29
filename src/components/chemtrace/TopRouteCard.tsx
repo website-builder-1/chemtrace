@@ -53,10 +53,10 @@ function ConditionsBlock({ c }: { c?: ReactionConditions }) {
   return (
     <div className="mt-1.5 ml-7 p-2 rounded-[3px] border" style={{ backgroundColor: 'hsl(var(--ct-paper2))', borderColor: 'hsl(var(--ct-border))' }}>
       <div className="flex items-center gap-1.5 mb-1.5">
-        <img src={logoMark} alt="" className="h-3 w-auto" />
+        <img src={logoMark} alt="" className="h-4 w-auto" />
         <span className="font-mono-data uppercase text-[0.55rem] tracking-wider" style={{ color: 'hsl(var(--ct-muted))' }}>PREDICTED CONDITIONS</span>
         {typeof c.confidence === 'number' && (
-          <span className="font-mono-data text-[0.55rem] px-1 py-px rounded-[2px]" style={{ color: 'white', backgroundColor: c.confidence >= 0.7 ? 'hsl(var(--ct-status-green))' : c.confidence >= 0.4 ? 'hsl(var(--ct-status-gold))' : 'hsl(var(--ct-status-red))' }}>
+          <span className="font-mono-data text-[0.55rem] px-1 py-px rounded-[2px]" style={{ color: 'hsl(var(--ct-logo-paper))', backgroundColor: c.confidence >= 0.7 ? 'hsl(var(--ct-status-green))' : c.confidence >= 0.4 ? 'hsl(var(--ct-status-gold))' : 'hsl(var(--ct-status-red))' }}>
             CONF {(c.confidence * 100).toFixed(0)}%
           </span>
         )}
@@ -112,13 +112,13 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
       <div className="bg-card rounded-[3px] p-6" style={{ borderLeft: '5px solid hsl(var(--ct-teal))', border: '1.5px solid hsl(var(--ct-teal))', borderLeftWidth: '5px' }}>
         {/* Header */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className="font-mono-data uppercase text-[0.6rem] tracking-wider text-white px-2 py-0.5 rounded-[1px]" style={{ backgroundColor: 'hsl(var(--ct-teal))' }}>★ Recommended</span>
-          <span className="font-serif-display font-bold text-base" style={{ color: 'hsl(var(--ct-ink))' }}>{route.name}</span>
+          <span className="font-mono-data uppercase text-[0.6rem] tracking-wider text-brand-paper px-2 py-0.5 rounded-[1px]" style={{ backgroundColor: 'hsl(var(--ct-teal))' }}>★ Recommended</span>
+          <span className="font-serif-display font-normal text-xl" style={{ color: 'hsl(var(--ct-ink))' }}>{route.name}</span>
           <span className="font-mono-data uppercase text-[0.6rem] tracking-wider" style={{ color: st.color }}>{st.icon} {route.status}</span>
           <EvidenceBadge level={toEvidenceLevel(route.evidence)} />
           {route.aiGenerated && (
             <span className="inline-flex items-center gap-1 font-mono-data uppercase text-[0.55rem] tracking-wider px-1.5 py-0.5 rounded-[2px]" style={{ backgroundColor: 'hsl(var(--ct-paper2))', color: 'hsl(var(--ct-status-gold))' }}>
-              <Bot className="w-3 h-3" /> ChemTraceIt AI proposal
+              <Bot className="w-3 h-3" /> Chemtraceit AI proposal
             </span>
           )}
           {route.engine === 'verified-literature' && (
@@ -132,7 +132,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
         <div className="flex flex-wrap gap-6 mb-5">
           {stats.map(s => (
             <div key={s.label} className="text-center">
-              <div className="font-mono-data text-xl font-medium" style={{ color: 'hsl(var(--ct-teal))' }}>{s.value}</div>
+              <div className="font-mono-data text-[26px] font-normal" style={{ color: 'hsl(var(--ct-ink))' }}>{s.value}</div>
               <div className="font-mono-data uppercase text-[0.55rem] tracking-wider mt-0.5" style={{ color: 'hsl(var(--ct-muted))' }}>{s.label}</div>
             </div>
           ))}
@@ -168,7 +168,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
         <div className="space-y-3 mb-4">
           {route.steps.map(step => (
             <div key={step.number} className="flex items-start gap-2.5">
-              <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-mono-data text-[0.6rem] text-white" style={{ backgroundColor: 'hsl(var(--ct-teal))' }}>{step.number}</span>
+              <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center font-mono-data text-[0.6rem] text-brand-paper" style={{ backgroundColor: 'hsl(var(--ct-teal))' }}>{step.number}</span>
               <div className="flex-1 min-w-0">
                 <span className="font-body text-sm leading-relaxed" style={{ color: 'hsl(var(--ct-ink))' }}>
                   {step.description}
@@ -218,7 +218,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-1 font-body italic text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>Prices update when changed. Currency conversions use indicative reference rates, not live exchange rates — confirm on the supplier's site before ordering.</p>
+                    <p className="mt-1 font-body italic text-[0.6rem]" style={{ color: 'hsl(var(--ct-muted))' }}>Prices update when changed. Currency conversions use indicative reference rates, not live exchange rates. Confirm on the supplier's site before ordering.</p>
                   </div>
                 )}
               </div>
@@ -233,7 +233,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
         {/* Static curated citation, kept as historical reference */}
         <div className="p-3 rounded-r-[2px] mb-3" style={{ backgroundColor: 'hsl(var(--ct-paper2))', borderLeft: '3px solid hsl(var(--ct-amber))' }}>
           <span className="mr-1">📖</span>
-          <span className="font-serif-display italic text-sm leading-relaxed" style={{ color: 'hsl(var(--ct-muted))' }}>{route.citation}</span>
+          <span className="font-body italic text-sm leading-relaxed" style={{ color: 'hsl(var(--ct-muted))' }}>{route.citation}</span>
         </div>
 
         {/* Live literature from CrossRef */}
@@ -264,7 +264,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
                     <ExternalLink className="w-2.5 h-2.5 translate-y-[1px] flex-shrink-0" />
                     <span>
                       <span className="font-medium">{c.title}</span>
-                      {c.journal && <span className="italic" style={{ color: 'hsl(var(--ct-muted))' }}> — {c.journal}</span>}
+                      {c.journal && <span className="italic" style={{ color: 'hsl(var(--ct-muted))' }}> · {c.journal}</span>}
                       {c.year && <span style={{ color: 'hsl(var(--ct-muted))' }}> ({c.year})</span>}
                     </span>
                   </a>
@@ -290,7 +290,7 @@ export default function TopRouteCard({ route, molecule, currency }: TopRouteCard
 
       {/* Risk notes */}
       {route.riskNotes?.map((note, i) => {
-        const bg = note.type === 'error' ? 'hsl(0,90%,96%)' : note.type === 'warning' ? 'hsl(38,90%,96%)' : 'hsl(210,90%,96%)';
+        const bg = note.type === 'error' ? 'hsl(var(--ct-blocked-bg))' : note.type === 'warning' ? 'hsl(var(--ct-review-bg))' : 'hsl(var(--ct-paper2))';
         const border = note.type === 'error' ? 'hsl(var(--ct-status-red))' : note.type === 'warning' ? 'hsl(var(--ct-status-gold))' : 'hsl(var(--ct-teal))';
         return (
           <div key={i} className="mt-2 p-3 rounded-[3px] font-body text-sm" style={{ backgroundColor: bg, borderLeft: `3px solid ${border}`, color: 'hsl(var(--ct-ink))' }}>

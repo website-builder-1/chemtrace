@@ -53,7 +53,7 @@ export default function Research() {
       user_id: userId, question: asked, answer: res.answer, rating: fbRating,
       correction: fbText.trim() || null, reason: fbRating === 'good' ? 'Thumbs up' : 'Thumbs down',
     });
-    if (error) toast.error(error.message); else { toast.success('Thanks — your feedback was recorded for review.'); setFbRating(null); setFbText(''); }
+    if (error) toast.error(error.message); else { toast.success('Thanks. Your feedback was recorded for review.'); setFbRating(null); setFbText(''); }
   }
 
   async function saveToProject() {
@@ -64,8 +64,9 @@ export default function Research() {
       if (error) { toast.error(error.message); return; }
       proj = created;
     }
+    if (!proj) return;
     const { error } = await supabase.from('project_items').insert({
-      project_id: proj!.id, user_id: userId, item_type: 'answer', title: asked.slice(0, 120),
+      project_id: proj.id, user_id: userId, item_type: 'answer', title: asked.slice(0, 120),
       payload: { answer: res.answer, claims: res.claims, evidence: res.evidence } as never,
     });
     if (error) toast.error(error.message); else toast.success('Saved to "My research".');
@@ -77,7 +78,7 @@ export default function Research() {
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
       <SiteHeader />
       <main className="flex-1 max-w-4xl mx-auto px-5 py-12 w-full">
-        <div className="font-mono-data text-xs uppercase tracking-[0.2em]" style={{ color: 'hsl(var(--ct-teal))' }}>Chemical Intelligence Engine</div>
+        <div className="font-mono-data text-xs uppercase tracking-[0.2em]" style={{ color: 'hsl(var(--ct-teal))' }}>Chemtraceit AI</div>
         <h1 className="font-serif-display text-3xl sm:text-4xl mt-3" style={ink}>Ask a chemistry question</h1>
         <p className="font-body mt-3 max-w-2xl" style={muted}>
           Answers are built from PubChem, a reaction database, open literature (Europe PMC, OpenAlex) and RDKit calculations.
@@ -113,7 +114,7 @@ export default function Research() {
           </div>
         </form>
 
-        {loading && <p className="font-mono-data text-xs mt-4" style={muted}>Scanning using ChemTraceIt's Chemistry Artificial Intelligence Engine… this can take up to a minute.</p>}
+        {loading && <p className="font-mono-data text-xs mt-4" style={muted}>Scanning using Chemtraceit AI. This can take up to a minute.</p>}
 
         {res && (
           <div className="mt-8 space-y-6">
