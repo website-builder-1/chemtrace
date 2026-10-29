@@ -33,7 +33,22 @@ const compare: [string, boolean, boolean][] = [
 export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
-      <PageMeta title="Chemtraceit — Synthesis Route Planning & Sourcing" description="Compare synthesis routes by chemistry, cost, supply and risk. Route planning, reagent sourcing and geopolitical risk checks in one platform." path="/" />
+      <PageMeta
+        title="Synthesis Route Planning & Reagent Sourcing | Chemtraceit"
+        description="Compare synthesis routes by chemistry, cost, supply and geopolitical risk. Plan routes, source reagents and price them in one place. Request access today."
+        keywords="synthesis route planning, retrosynthesis, reagent sourcing, chemical procurement, supply chain risk, chemistry software"
+        path="/"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'SoftwareApplication',
+          name: 'Chemtraceit',
+          applicationCategory: 'BusinessApplication',
+          operatingSystem: 'Web',
+          url: 'https://chemtraceit.com/',
+          description: 'Synthesis route planning, reagent sourcing and geopolitical risk checks for chemistry teams.',
+          publisher: { '@type': 'Organization', name: 'Chemtraceit', url: 'https://chemtraceit.com/' },
+        }}
+      />
       <SiteHeader />
       <main className="flex-1">
         <section className="max-w-6xl mx-auto px-5 pt-16 pb-14 md:pt-24">

@@ -15,13 +15,13 @@ export function BrandLogo({ tone = 'dark', size = 'md', showName = true }: { ton
 }
 
 /** Centered hero lockup for the sign-in and account-setup pages. */
-export function BrandHero({ subtitle }: { subtitle: string }) {
+export function BrandHero({ subtitle, heading = 'Chemtraceit' }: { subtitle: string; heading?: string }) {
   return (
     <div className="flex flex-col items-center text-center mb-8 text-foreground">
       <div className="p-7">
         <span className="ct-brand-mark block h-14 w-[62px]" aria-hidden="true" />
       </div>
-      <h1 className="font-serif-display font-bold text-3xl">Chemtraceit</h1>
+      <h1 className="font-serif-display font-bold text-3xl"><span className="sr-only">{heading === 'Chemtraceit' ? '' : `${heading} — `}</span>Chemtraceit</h1>
       <div className="w-10 h-px my-3 bg-primary" />
       <p className="font-mono-data text-xs text-muted-foreground">{subtitle}</p>
     </div>
