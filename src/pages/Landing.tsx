@@ -78,8 +78,8 @@ export default function Landing() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
               {features.map(f => (
                 <div key={f.title} className="bg-card border rounded-[3px] p-5" style={{ borderColor: 'hsl(var(--ct-border))' }}>
-                  <f.icon className="w-5 h-5" style={{ color: 'hsl(var(--ct-teal))' }} />
-                  <div className="font-mono-data text-sm uppercase tracking-wider mt-3" style={{ color: 'hsl(var(--ct-ink))' }}>{f.title}</div>
+                  <f.icon aria-hidden="true" className="w-5 h-5" style={{ color: 'hsl(var(--ct-teal))' }} />
+                  <h3 className="font-mono-data text-sm uppercase tracking-wider mt-3" style={{ color: 'hsl(var(--ct-ink))' }}>{f.title}</h3>
                   <p className="font-body text-sm mt-2" style={{ color: 'hsl(var(--ct-muted))' }}>{f.text}</p>
                 </div>
               ))}
@@ -93,7 +93,7 @@ export default function Landing() {
             {steps.map(([n, t, d]) => (
               <div key={n} className="border-t-2 pt-4" style={{ borderColor: 'hsl(var(--ct-teal))' }}>
                 <div className="font-mono-data text-2xl" style={{ color: 'hsl(var(--ct-teal))' }}>{n}</div>
-                <div className="font-serif-display text-xl mt-2" style={{ color: 'hsl(var(--ct-ink))' }}>{t}</div>
+                <h3 className="font-serif-display text-xl mt-2" style={{ color: 'hsl(var(--ct-ink))' }}>{t}</h3>
                 <p className="font-body text-sm mt-2" style={{ color: 'hsl(var(--ct-muted))' }}>{d}</p>
               </div>
             ))}
