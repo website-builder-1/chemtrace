@@ -1,3 +1,4 @@
+import { PageMeta } from '@/components/site/PageMeta';
 import { Link } from 'react-router-dom';
 import { Route, PackageSearch, ShieldCheck, Receipt, Check, Minus } from 'lucide-react';
 import { SiteHeader, SiteFooter } from '@/components/site/SiteChrome';

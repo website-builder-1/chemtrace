@@ -1,3 +1,4 @@
+import { PageMeta } from '@/components/site/PageMeta';
 import { SiteHeader, SiteFooter } from '@/components/site/SiteChrome';
 
 // Placeholder bios — replace with the team's real photos and text.
