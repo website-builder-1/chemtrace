@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { PipelineResults, ChatMessage } from '@/types/chemtrace';
 import ReactMarkdown from 'react-markdown';
 import SectionLabel from './SectionLabel';
+import { fmt, type Currency } from '@/lib/currency';
 
 const SUGGESTED_QUESTIONS = [
   'Why is this route preferred?',
@@ -17,9 +18,10 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chemtrace-ag
 
 interface Props {
   results: PipelineResults;
+  currency: Currency;
 }
 
-export default function AIAgentPanel({ results }: Props) {
+export default function AIAgentPanel({ results, currency }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -27,8 +29,9 @@ export default function AIAgentPanel({ results }: Props) {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const buildContext = () => {
-    const rec = results.routes.find(r => r.id === results.recommendedRouteId)!;
-    return `Molecule: ${results.molecule.name} (${results.molecule.smiles}), MW: ${results.molecule.mw}, Location: ${results.location}. Recommended route: ${rec.name} (${rec.status}, yield ${rec.yieldPercent}%, £${rec.costPerGram}/g). Steps: ${rec.steps.map(s => `${s.number}. ${s.description}`).join(' | ')}. Reagents: ${rec.reagents.join(', ')}. ${results.routes.length} total routes evaluated.`;
+    const rec = results.routes.find(r => r.id === results.recommendedRouteId);
+    if (!rec) return '';
+    return `Selected currency: ${currency}. Express any new monetary amounts in ${currency}; older messages may use their original currency. Conversion rates are indicative, not live. Molecule: ${results.molecule.name} (${results.molecule.smiles}), MW: ${results.molecule.mw}, Location: ${results.location}. Recommended route: ${rec.name} (${rec.status}, yield ${rec.yieldPercent}%, ${fmt(rec.costPerGram, currency)}/g). Steps: ${rec.steps.map(s => `${s.number}. ${s.description}`).join(' | ')}. Reagents: ${rec.reagents.join(', ')}. ${results.routes.length} total routes evaluated.`;
   };
 
   const streamResponse = async (userMessages: ChatMessage[]) => {
@@ -127,7 +130,7 @@ export default function AIAgentPanel({ results }: Props) {
     window.addEventListener('chemtrace:explain', handler as EventListener);
     return () => window.removeEventListener('chemtrace:explain', handler as EventListener);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]);
+  }, [isLoading, currency, results]);
 
   return (
     <section id="chemtrace-ai-panel">
