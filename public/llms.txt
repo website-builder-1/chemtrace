@@ -1,0 +1,10 @@
+# Chemtraceit
+
+> Chemtraceit compares chemical synthesis routes by chemistry, cost, supply and geopolitical risk, with reagent sourcing and procurement in one invite-only platform.
+
+Chemtraceit is a confidential, invite-only platform for chemistry teams. It plans synthesis routes from a target molecule, checks each route with atom-balance validation, prices the reagents across real suppliers, and flags supply and geopolitical risk. The tool itself requires a client account; only the pages below are public.
+
+## Pages
+
+- [Home](https://chemtraceit.com/): Product overview — route comparison, chemistry metrics, supplier pricing and risk checks.
+- [Team](https://chemtraceit.com/team): The people behind Chemtraceit.

@@ -16,3 +16,4 @@
 - [x] Admin/Moderator logins and pages
 - [x] Invite-only access, client accounts, first-login password + terms signing, people search
 - [ ] Solicitor review of Terms of Use draft (user action)
+- [x] Universal SEO/AI-search brief: AI crawler policy in robots.txt, llms.txt, site.webmanifest, sitemap cleaned of invented dates, 8 automated SEO guardrail tests (13/13 pass with currency tests)
