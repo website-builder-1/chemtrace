@@ -117,3 +117,11 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Keep AI equations inside their box on every screen size */
+.ct-markdown { overflow-wrap: anywhere; min-width: 0; }
+.ct-markdown .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 0.25rem 0; }
+.ct-markdown .katex-display > .katex { white-space: normal; font-size: 1em; }
+.ct-markdown .katex-display > .katex > .katex-html { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; row-gap: 0.5rem; }
+.ct-markdown .katex { font-size: 1em; }
+.ct-markdown .katex .base { margin-block: 0.15rem; }
