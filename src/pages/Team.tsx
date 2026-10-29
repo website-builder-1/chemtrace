@@ -18,11 +18,19 @@ export default function Team() {
         keywords="Chemtraceit team, synthesis route planning, chemistry software, reagent sourcing, chemical supply chain"
         path="/team"
         jsonLd={[
-          { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'Chemtraceit team', url: 'https://chemtraceit.com/team' },
+          { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'Chemtraceit team', url: 'https://chemtraceit.com/team', about: { '@id': 'https://chemtraceit.com/#org' } },
           { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
             { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://chemtraceit.com/' },
             { '@type': 'ListItem', position: 2, name: 'Team', item: 'https://chemtraceit.com/team' },
           ] },
+          ...team.map(m => ({
+            '@context': 'https://schema.org',
+            '@type': 'Person',
+            name: m.name,
+            jobTitle: m.role,
+            description: m.bio,
+            worksFor: { '@id': 'https://chemtraceit.com/#org' },
+          })),
         ]}
       />
       <SiteHeader />
