@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect, useRef } from 'react';
 import type { PipelineResults, ChatMessage } from '@/types/chemtrace';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '@/components/chemtrace/Markdown';
 import SectionLabel from './SectionLabel';
 import { fmt, type Currency } from '@/lib/currency';
 
@@ -173,8 +173,8 @@ export default function AIAgentPanel({ results, currency }: Props) {
             <div className="font-mono-data uppercase text-[0.58rem] tracking-wider mb-1" style={{ color: 'hsl(var(--ct-muted))' }}>
               {msg.role === 'agent' ? 'Chemtraceit AI' : 'YOU'}
             </div>
-            <div className="font-body text-sm leading-relaxed prose prose-sm max-w-none" style={{ color: 'hsl(var(--ct-ink))' }}>
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            <div className="font-body text-sm leading-relaxed max-w-none" style={{ color: 'hsl(var(--ct-ink))' }}>
+              <Markdown>{msg.content}</Markdown>
             </div>
           </div>
         ))}

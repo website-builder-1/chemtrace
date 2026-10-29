@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
 import type { PipelineResults } from '@/types/chemtrace';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '@/components/chemtrace/Markdown';
 import SectionLabel from './SectionLabel';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chemtrace-agent`;
@@ -101,10 +101,10 @@ export default function ProtocolGenerator({ results }: { results: PipelineResult
         )}
       </div>
       <div
-        className="bg-card border rounded-[3px] p-5 font-body text-sm leading-[1.75] min-h-[160px] prose prose-sm max-w-none"
+        className="bg-card border rounded-[3px] p-5 font-body text-sm leading-[1.75] min-h-[160px] max-w-none"
         style={{ borderColor: 'hsl(var(--ct-border))', color: 'hsl(var(--ct-ink))' }}
       >
-        <ReactMarkdown>{protocol}</ReactMarkdown>
+        <Markdown>{protocol}</Markdown>
       </div>
     </section>
   );
