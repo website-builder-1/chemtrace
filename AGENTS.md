@@ -12,3 +12,4 @@
 - First sign-in: `profiles.must_change_password` → `admin-users` `change_own_password`; terms signed via `complete_onboarding` RPC against `TERMS_VERSION` in `src/content/terms.ts` (bump to force re-sign).
 - Moderators may manage client accounts only; enforced in `admin-users`.
 - Keep route cost data in GBP and supplier prices in their original currency; all price views and exports use the shared currency helpers and the tool's selected currency to prevent double conversion.
+- Brand styling is centralised in global CSS tokens and shared BrandLogo/BrandHero components; read `docs/brand-guidelines.html` for future design changes, keeping the original PNG master and using its derived cutout mask so logo details match each background.
