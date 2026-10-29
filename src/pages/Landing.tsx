@@ -22,6 +22,29 @@ const steps = [
   ['03', 'Procure with confidence', 'Check supply and compliance risk, then export the reagent invoice.'],
 ];
 
+const faqs = [
+  {
+    q: 'What is Chemtraceit?',
+    a: 'Chemtraceit is a web platform that plans chemical synthesis routes for a target molecule, checks each route for atom balance, prices the reagents across real suppliers, and scores supply and geopolitical risk — ending in a costed procurement invoice.',
+  },
+  {
+    q: 'Who is it for?',
+    a: 'Chemistry teams in research and industry who need to compare synthesis pathways and source starting materials. It is a confidential, invite-only platform: every account is created by the Chemtraceit team.',
+  },
+  {
+    q: 'How do I get access?',
+    a: 'Access is by invitation only. The Chemtraceit team creates your client account, and on first sign-in you set your own password and sign the terms of use. There is no public sign-up.',
+  },
+  {
+    q: 'Are the supplier prices live quotes?',
+    a: 'No. Prices are indicative catalogue estimates, labelled with their date and source. Staff-checked prices are marked as such. Always confirm the final price with the supplier before ordering.',
+  },
+  {
+    q: 'What are the limitations?',
+    a: 'Predicted routes and conditions are decision support, not laboratory instructions. Every route carries an evidence label — documented, analogous or hypothesis — and a qualified chemist must review any route before practical work.',
+  },
+];
+
 const compare: [string, boolean, boolean][] = [
   ['Retrosynthetic route planning', true, true],
   ['Reagent procurement', true, true],
@@ -46,7 +69,7 @@ export default function Landing() {
           operatingSystem: 'Web',
           url: 'https://chemtraceit.com/',
           description: 'Synthesis route planning, reagent sourcing and geopolitical risk checks for chemistry teams.',
-          publisher: { '@type': 'Organization', name: 'Chemtraceit', url: 'https://chemtraceit.com/' },
+          publisher: { '@id': 'https://chemtraceit.com/#org' },
         }}
       />
       <SiteHeader />
@@ -123,6 +146,20 @@ export default function Landing() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        <section className="border-t" style={{ backgroundColor: 'hsl(var(--ct-paper2))', borderColor: 'hsl(var(--ct-border))' }}>
+          <div className="max-w-6xl mx-auto px-5 py-16">
+            <h2 className="font-serif-display text-3xl" style={{ color: 'hsl(var(--ct-ink))' }}>Common questions</h2>
+            <div className="grid md:grid-cols-2 gap-4 mt-8">
+              {faqs.map(f => (
+                <div key={f.q} className="bg-card border rounded-[3px] p-5" style={{ borderColor: 'hsl(var(--ct-border))' }}>
+                  <h3 className="font-serif-display text-lg" style={{ color: 'hsl(var(--ct-ink))' }}>{f.q}</h3>
+                  <p className="font-body text-sm mt-2" style={{ color: 'hsl(var(--ct-muted))' }}>{f.a}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>
