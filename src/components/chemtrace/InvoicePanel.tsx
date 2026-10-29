@@ -15,9 +15,24 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
   const [showInvoice, setShowInvoice] = useState(false);
   if (!recommended) return null;
   const rec = { ...recommended, reagentProcurement: recommended.reagentProcurement.map(r => enrichReagent(r, catalog)) };
-  const invoice = generateInvoiceData(rec, results.batchSizeMg, currency);
+  const rawInvoice = generateInvoiceData(rec, results.batchSizeMg, currency);
+  // Drop placeholder rows like "none" that aren't real reagents.
+  const invoice = { ...rawInvoice, items: rawInvoice.items.filter(i => !/^(none|n\/a|-|–)?$/i.test(i.reagent.trim())) };
+  const pricedCount = invoice.items.filter(i => i.total != null).length;
+  const unpricedCount = invoice.items.length - pricedCount;
   const sym = symbol(currency);
   const money = (amount: number | null) => amount == null ? 'Quote required' : formatCurrency(amount, currency, currency);
+  // Never show £0.00 when items are unpriced: show "Quote required" or "£X + quotes".
+  const totalLabel = (amount: number | null) => {
+    if (pricedCount === 0) return 'Quote required';
+    const v = money(amount);
+    return unpricedCount > 0 ? `${v} + quotes` : v;
+  };
+  const note = pricedCount === 0
+    ? 'Pricing on request: none of these reagents are in our supplier catalogue yet. Request quotes from suppliers for a total.'
+    : unpricedCount > 0
+      ? `Partial estimate: ${unpricedCount} of ${invoice.items.length} items need supplier quotes and are not included in the total.`
+      : null;
 
   // Identify critical-path reagent (longest lead time)
   const criticalReagent = rec.reagentProcurement.length > 0
@@ -61,11 +76,11 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
     y += 3;
     doc.line(20, y, 190, y); y += 6;
     doc.setFont('helvetica', 'bold');
-    if (invoice.incomplete) { doc.text('Partial estimate: unpriced items require supplier quotes.', 20, y); y += 6; }
-    doc.text(`Subtotal: ${money(invoice.subtotal)}`, 150, y); y += 5;
-    doc.text(`VAT (20%): ${money(invoice.vat)}`, 150, y); y += 5;
+    if (note) { doc.splitTextToSize(note, 170).forEach((l: string) => { doc.text(l, 20, y); y += 5; }); y += 1; }
+    doc.text(`Subtotal: ${totalLabel(invoice.subtotal)}`, 130, y); y += 5;
+    doc.text(`VAT (20%): ${totalLabel(invoice.vat)}`, 130, y); y += 5;
     doc.setFontSize(10);
-    doc.text(`TOTAL: ${money(invoice.grandTotal)}`, 150, y);
+    doc.text(`TOTAL: ${totalLabel(invoice.grandTotal)}`, 130, y);
 
     doc.save(`chemtrace_invoice_${invoice.invoiceNumber}.pdf`);
   };
@@ -114,7 +129,7 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
             </thead>
             <tbody>
               {invoice.items.map((item, i) => (
-                <tr key={item.cas} style={{ backgroundColor: i % 2 === 0 ? 'hsl(var(--ct-paper2))' : 'hsl(var(--card))', borderBottom: '1px solid hsl(var(--ct-border))' }}>
+                <tr key={`${item.reagent}-${i}`} style={{ backgroundColor: i % 2 === 0 ? 'hsl(var(--ct-paper2))' : 'hsl(var(--card))', borderBottom: '1px solid hsl(var(--ct-border))' }}>
                   <td className="font-body text-xs px-2 py-1.5">{item.reagent}</td>
                   <td className="font-mono-data text-[0.7rem] px-2 py-1.5">{item.cas}</td>
                   <td className="font-body text-xs px-2 py-1.5">{item.supplier}</td>
@@ -128,10 +143,10 @@ export default function InvoicePanel({ results, currency }: { results: PipelineR
           </div>
 
           <div className="text-right space-y-1">
-            {invoice.incomplete && <p className="font-body text-xs text-muted-foreground">Partial estimate. unpriced items require supplier quotes.</p>}
-            <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>Subtotal: {money(invoice.subtotal)}</div>
-            <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>VAT (20%): {money(invoice.vat)}</div>
-            <div className="font-mono-data text-sm font-bold" style={{ color: 'hsl(var(--ct-teal))' }}>TOTAL: {money(invoice.grandTotal)}</div>
+            {note && <p className="font-body text-xs text-muted-foreground">{note}</p>}
+            <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>Subtotal: {totalLabel(invoice.subtotal)}</div>
+            <div className="font-mono-data text-xs" style={{ color: 'hsl(var(--ct-ink))' }}>VAT (20%): {totalLabel(invoice.vat)}</div>
+            <div className="font-mono-data text-sm font-bold" style={{ color: 'hsl(var(--ct-teal))' }}>TOTAL: {totalLabel(invoice.grandTotal)}</div>
           </div>
         </div>
       )}
