@@ -32,6 +32,7 @@ const compare: [string, boolean, boolean][] = [
 export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
+      <PageMeta title="Chemtraceit — Synthesis Route Planning & Sourcing" description="Compare synthesis routes by chemistry, cost, supply and risk. Route planning, reagent sourcing and geopolitical risk checks in one platform." path="/" />
       <SiteHeader />
       <main className="flex-1">
         <section className="max-w-6xl mx-auto px-5 pt-16 pb-14 md:pt-24">

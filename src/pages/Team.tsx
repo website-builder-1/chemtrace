@@ -11,6 +11,7 @@ const team = [
 export default function Team() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'hsl(var(--ct-paper))' }}>
+      <PageMeta title="Our Team — Chemtraceit" description="Meet the chemists and engineers behind Chemtraceit, the synthesis route planning, reagent sourcing and supply-risk platform." path="/team" />
       <SiteHeader />
       <main className="flex-1 max-w-6xl mx-auto px-5 py-16 w-full">
         <div className="font-mono-data text-xs uppercase tracking-[0.2em]" style={{ color: 'hsl(var(--ct-teal))' }}>The people</div>
